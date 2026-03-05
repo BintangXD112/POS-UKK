@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Supplier;
 use App\Services\ActivityLogger;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -13,7 +13,7 @@ class SupplierController extends Controller
 {
     public function index(Request $request): Response
     {
-        $user      = $request->user();
+        $user = $request->user();
         $sekolahId = $user->id_sekolah;
 
         $query = Supplier::orderBy('nama');
@@ -29,10 +29,10 @@ class SupplierController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'nama'            => 'required|string|max:100',
-            'no_telepon'      => 'nullable|string|max:20',
+            'nama' => 'required|string|max:100',
+            'no_telepon' => 'nullable|string|max:20',
             'alamat_supplier' => 'nullable|string',
-            'id_sekolah'      => $user->isSuperAdmin()
+            'id_sekolah' => $user->isSuperAdmin()
                 ? 'required|exists:tb_sekolah,id_sekolah'
                 : 'nullable',
         ]);
@@ -44,18 +44,20 @@ class SupplierController extends Controller
 
         Supplier::create($validated);
         ActivityLogger::log('create', 'Supplier', "Menambah supplier: {$validated['nama']}");
+
         return back()->with('success', 'Supplier berhasil ditambahkan.');
     }
 
     public function update(Request $request, Supplier $supplier): RedirectResponse
     {
         $validated = $request->validate([
-            'nama'            => 'required|string|max:100',
-            'no_telepon'      => 'nullable|string|max:20',
+            'nama' => 'required|string|max:100',
+            'no_telepon' => 'nullable|string|max:20',
             'alamat_supplier' => 'nullable|string',
         ]);
         $supplier->update($validated);
         ActivityLogger::log('update', 'Supplier', "Mengubah supplier: {$supplier->nama}");
+
         return back()->with('success', 'Supplier berhasil diperbarui.');
     }
 
@@ -64,6 +66,7 @@ class SupplierController extends Controller
         $nama = $supplier->nama;
         $supplier->delete();
         ActivityLogger::log('delete', 'Supplier', "Menghapus supplier: {$nama}");
+
         return back()->with('success', 'Supplier berhasil dihapus.');
     }
 }

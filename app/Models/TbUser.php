@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TbUser extends Authenticatable
 {
     use Notifiable, SoftDeletes;
 
     protected $table = 'tb_user';
+
     protected $primaryKey = 'id_user';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -68,10 +70,22 @@ class TbUser extends Authenticatable
         if (is_array($role)) {
             return in_array($this->role?->nama_role, $role);
         }
+
         return $this->role?->nama_role === $role;
     }
 
-    public function isSuperAdmin(): bool { return $this->hasRole('super admin'); }
-    public function isAdmin(): bool      { return $this->hasRole('admin'); }
-    public function isKasir(): bool      { return $this->hasRole('kasir'); }
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('super admin');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    public function isKasir(): bool
+    {
+        return $this->hasRole('kasir');
+    }
 }

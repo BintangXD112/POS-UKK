@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TbUser;
 use App\Models\Role;
 use App\Models\Sekolah;
+use App\Models\TbUser;
 use App\Services\ActivityLogger;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -17,14 +17,14 @@ class UserController extends Controller
     public function index(Request $request): Response
     {
         $authUser = $request->user();
-        $query    = TbUser::with(['role', 'sekolah']);
+        $query = TbUser::with(['role', 'sekolah']);
 
         if ($authUser->isAdmin()) {
             // Admin hanya bisa lihat user di sekolahnya sendiri
             $query->where('id_sekolah', $authUser->id_sekolah);
         }
 
-        $users   = $query->orderBy('nama_lengkap')->get();
+        $users = $query->orderBy('nama_lengkap')->get();
 
         // Admin tidak bisa lihat / memilih role super admin
         $roles = $authUser->isAdmin()
@@ -34,12 +34,12 @@ class UserController extends Controller
         $sekolah = Sekolah::where('is_active', 1)->get();
 
         return Inertia::render('users/index', [
-            'users'    => $users,
-            'roles'    => $roles,
-            'sekolah'  => $sekolah,
+            'users' => $users,
+            'roles' => $roles,
+            'sekolah' => $sekolah,
             'authUser' => [
                 'id_sekolah' => $authUser->id_sekolah,
-                'role'       => $authUser->role?->nama_role,
+                'role' => $authUser->role?->nama_role,
             ],
         ]);
     }
@@ -49,12 +49,12 @@ class UserController extends Controller
         $authUser = $request->user();
 
         $validated = $request->validate([
-            'id_sekolah'   => 'nullable|exists:tb_sekolah,id_sekolah',
-            'id_role'      => 'required|exists:roles,id_role',
-            'username'     => 'required|string|max:50|unique:tb_user,username',
-            'password'     => 'required|string|min:6',
+            'id_sekolah' => 'nullable|exists:tb_sekolah,id_sekolah',
+            'id_role' => 'required|exists:roles,id_role',
+            'username' => 'required|string|max:50|unique:tb_user,username',
+            'password' => 'required|string|min:6',
             'nama_lengkap' => 'required|string|max:100',
-            'is_active'    => 'boolean',
+            'is_active' => 'boolean',
         ]);
 
         // Proteksi tambahan di backend
@@ -69,11 +69,12 @@ class UserController extends Controller
             }
         }
 
-        $validated['password']   = Hash::make($validated['password']);
+        $validated['password'] = Hash::make($validated['password']);
         $validated['created_by'] = $authUser->id_user;
 
         TbUser::create($validated);
         ActivityLogger::log('create', 'User', "Menambah user: {$validated['nama_lengkap']} ({$validated['username']})");
+
         return back()->with('success', 'User berhasil ditambahkan.');
     }
 
@@ -87,12 +88,12 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'id_sekolah'   => 'nullable|exists:tb_sekolah,id_sekolah',
-            'id_role'      => 'required|exists:roles,id_role',
-            'username'     => 'required|string|max:50|unique:tb_user,username,' . $user->id_user . ',id_user',
+            'id_sekolah' => 'nullable|exists:tb_sekolah,id_sekolah',
+            'id_role' => 'required|exists:roles,id_role',
+            'username' => 'required|string|max:50|unique:tb_user,username,'.$user->id_user.',id_user',
             'nama_lengkap' => 'required|string|max:100',
-            'is_active'    => 'boolean',
-            'password'     => 'nullable|string|min:6',
+            'is_active' => 'boolean',
+            'password' => 'nullable|string|min:6',
         ]);
 
         // Proteksi backend untuk admin
@@ -114,6 +115,7 @@ class UserController extends Controller
         $validated['updated_by'] = $authUser->id_user;
         $user->update($validated);
         ActivityLogger::log('update', 'User', "Mengubah user: {$user->nama_lengkap} ({$user->username})");
+
         return back()->with('success', 'Data user berhasil diperbarui.');
     }
 
@@ -129,6 +131,7 @@ class UserController extends Controller
         $nama = $user->nama_lengkap;
         $user->delete();
         ActivityLogger::log('delete', 'User', "Menghapus user: {$nama}");
+
         return back()->with('success', 'User berhasil dihapus.');
     }
 }

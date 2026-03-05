@@ -1,18 +1,17 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\SekolahController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\KategoriController;
-use App\Http\Controllers\PelangganController;
-use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PenjualanController;
-use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\SekolahController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 
 // ── Halaman utama ──────────────────────────────────────────────────────────────
 Route::get('/', fn () => redirect()->route('dashboard'))->name('home');

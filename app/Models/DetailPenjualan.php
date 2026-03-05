@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class DetailPenjualan extends Model
 {
     protected $table = 'tb_detail_penjualan';
+
     public $timestamps = false;
+
     public $incrementing = false;
 
     protected $primaryKey = null; // composite PK
@@ -20,11 +22,11 @@ class DetailPenjualan extends Model
     ];
 
     protected $casts = [
-        'harga_beli'    => 'decimal:2',
-        'harga_jual'    => 'decimal:2',
-        'diskon_nilai'  => 'decimal:2',
-        'diskon_nominal'=> 'decimal:2',
-        'subtotal'      => 'decimal:2',
+        'harga_beli' => 'decimal:2',
+        'harga_jual' => 'decimal:2',
+        'diskon_nilai' => 'decimal:2',
+        'diskon_nominal' => 'decimal:2',
+        'subtotal' => 'decimal:2',
     ];
 
     public function penjualan(): BelongsTo

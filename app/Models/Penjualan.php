@@ -3,16 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Penjualan extends Model
 {
     use SoftDeletes;
 
     protected $table = 'tb_penjualan';
+
     protected $primaryKey = 'id_penjualan';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -23,10 +25,10 @@ class Penjualan extends Model
     ];
 
     protected $casts = [
-        'total_faktur'     => 'decimal:2',
-        'total_bayar'      => 'decimal:2',
-        'kembalian'        => 'decimal:2',
-        'tanggal_penjualan'=> 'datetime',
+        'total_faktur' => 'decimal:2',
+        'total_bayar' => 'decimal:2',
+        'kembalian' => 'decimal:2',
+        'tanggal_penjualan' => 'datetime',
     ];
 
     protected $dates = ['created_at', 'tanggal_penjualan', 'deleted_at'];

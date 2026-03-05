@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pelanggan;
 use App\Models\KelompokPelanggan;
+use App\Models\Pelanggan;
 use App\Services\ActivityLogger;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,7 +14,7 @@ class PelangganController extends Controller
 {
     public function index(Request $request): Response
     {
-        $user      = $request->user();
+        $user = $request->user();
         $sekolahId = $user->id_sekolah;
 
         $query = KelompokPelanggan::with(['pelanggan' => fn ($q) => $q->orderBy('nama_pelanggan')])
@@ -28,10 +28,10 @@ class PelangganController extends Controller
 
     public function storeKelompok(Request $request): RedirectResponse
     {
-        $user      = $request->user();
+        $user = $request->user();
         $validated = $request->validate([
             'nama_kelompok' => 'required|string|max:50',
-            'id_sekolah'    => $user->isSuperAdmin()
+            'id_sekolah' => $user->isSuperAdmin()
                 ? 'required|exists:tb_sekolah,id_sekolah'
                 : 'nullable',
         ]);
@@ -40,6 +40,7 @@ class PelangganController extends Controller
             : $user->id_sekolah;
         KelompokPelanggan::create($validated);
         ActivityLogger::log('create', 'Pelanggan', "Menambah kelompok pelanggan: {$validated['nama_kelompok']}");
+
         return back()->with('success', 'Kelompok pelanggan berhasil ditambahkan.');
     }
 
@@ -48,6 +49,7 @@ class PelangganController extends Controller
         $validated = $request->validate(['nama_kelompok' => 'required|string|max:50']);
         $kelompok->update($validated);
         ActivityLogger::log('update', 'Pelanggan', "Mengubah kelompok pelanggan: {$kelompok->nama_kelompok}");
+
         return back()->with('success', 'Kelompok pelanggan berhasil diperbarui.');
     }
 
@@ -57,6 +59,7 @@ class PelangganController extends Controller
         $kelompok->pelanggan()->each(fn ($p) => $p->delete());
         $kelompok->delete();
         ActivityLogger::log('delete', 'Pelanggan', "Menghapus kelompok pelanggan: {$nama}");
+
         return back()->with('success', 'Kelompok pelanggan berhasil dihapus.');
     }
 
@@ -64,13 +67,14 @@ class PelangganController extends Controller
     {
         $validated = $request->validate([
             'id_kelompok_pelanggan' => 'required|exists:tb_kelompok_pelanggan,id_kelompok_pelanggan',
-            'nama_pelanggan'        => 'required|string|max:150',
-            'telepon'               => 'nullable|string|max:20',
-            'alamat'                => 'nullable|string',
+            'nama_pelanggan' => 'required|string|max:150',
+            'telepon' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
         ]);
         $validated['created_by'] = $request->user()->id_user;
         Pelanggan::create($validated);
         ActivityLogger::log('create', 'Pelanggan', "Menambah pelanggan: {$validated['nama_pelanggan']}");
+
         return back()->with('success', 'Pelanggan berhasil ditambahkan.');
     }
 
@@ -78,13 +82,14 @@ class PelangganController extends Controller
     {
         $validated = $request->validate([
             'id_kelompok_pelanggan' => 'required|exists:tb_kelompok_pelanggan,id_kelompok_pelanggan',
-            'nama_pelanggan'        => 'required|string|max:150',
-            'telepon'               => 'nullable|string|max:20',
-            'alamat'                => 'nullable|string',
+            'nama_pelanggan' => 'required|string|max:150',
+            'telepon' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
         ]);
         $validated['updated_by'] = $request->user()->id_user;
         $pelanggan->update($validated);
         ActivityLogger::log('update', 'Pelanggan', "Mengubah pelanggan: {$pelanggan->nama_pelanggan}");
+
         return back()->with('success', 'Pelanggan berhasil diperbarui.');
     }
 
@@ -93,6 +98,7 @@ class PelangganController extends Controller
         $nama = $pelanggan->nama_pelanggan;
         $pelanggan->delete();
         ActivityLogger::log('delete', 'Pelanggan', "Menghapus pelanggan: {$nama}");
+
         return back()->with('success', 'Pelanggan berhasil dihapus.');
     }
 }

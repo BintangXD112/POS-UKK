@@ -19,7 +19,7 @@ class KategoriSeeder extends Seeder
             // Alat Tulis
             ['id_kelompok' => 2, 'nama' => 'Pena & Pensil',    'created_by' => 1],
             ['id_kelompok' => 2, 'nama' => 'Buku & Kertas',    'created_by' => 1],
-            ['id_kelompok' => 2, 'nama' => 'Penghapus & Tip-X','created_by' => 1],
+            ['id_kelompok' => 2, 'nama' => 'Penghapus & Tip-X', 'created_by' => 1],
             // Elektronik
             ['id_kelompok' => 3, 'nama' => 'Aksesoris HP',     'created_by' => 1],
             ['id_kelompok' => 3, 'nama' => 'Kabel & Charger',  'created_by' => 1],

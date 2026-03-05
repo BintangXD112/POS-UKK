@@ -3,16 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pembelian extends Model
 {
     use SoftDeletes;
 
     protected $table = 'tb_pembelian';
+
     protected $primaryKey = 'id_pembelian';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -23,7 +25,7 @@ class Pembelian extends Model
     ];
 
     protected $casts = [
-        'total_bayar'    => 'decimal:2',
+        'total_bayar' => 'decimal:2',
         'tanggal_faktur' => 'datetime',
     ];
 

@@ -23,8 +23,8 @@ class ActivityLogController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('user_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
+                $q->where('user_name', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -36,13 +36,13 @@ class ActivityLogController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $logs    = $query->paginate(50)->withQueryString();
+        $logs = $query->paginate(50)->withQueryString();
         $modules = ActivityLog::distinct()->pluck('module')->sort()->values();
 
         return Inertia::render('activity-log/index', [
-            'logs'      => $logs,
-            'modules'   => $modules,
-            'filters'   => $request->only('action', 'module', 'search', 'date_from', 'date_to'),
+            'logs' => $logs,
+            'modules' => $modules,
+            'filters' => $request->only('action', 'module', 'search', 'date_from', 'date_to'),
         ]);
     }
 }

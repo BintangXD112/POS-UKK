@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class KelompokKategori extends Model
 {
     protected $table = 'tb_kelompok_kategori';
+
     protected $primaryKey = 'id_kelompok';
+
     public $timestamps = false;
 
     protected $fillable = ['id_sekolah', 'nama_kelompok', 'created_by'];

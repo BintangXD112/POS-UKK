@@ -19,11 +19,11 @@ class ActivityLogger
             $user = Auth::user();
 
             ActivityLog::create([
-                'user_id'    => $userId   ?? $user?->id_user,
-                'user_name'  => $userName ?? $user?->nama_lengkap,
-                'action'     => $action,
-                'module'     => $module,
-                'description'=> $description,
+                'user_id' => $userId ?? $user?->id_user,
+                'user_name' => $userName ?? $user?->nama_lengkap,
+                'action' => $action,
+                'module' => $module,
+                'description' => $description,
                 'ip_address' => Request::ip(),
                 'created_at' => now(),
             ]);

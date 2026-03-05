@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class DetailPembelian extends Model
 {
     protected $table = 'tb_detail_pembelian';
+
     protected $primaryKey = 'id_detail_pembelian';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -17,7 +19,7 @@ class DetailPembelian extends Model
 
     protected $casts = [
         'harga_beli' => 'decimal:2',
-        'subtotal'   => 'decimal:2',
+        'subtotal' => 'decimal:2',
     ];
 
     public function pembelian(): BelongsTo

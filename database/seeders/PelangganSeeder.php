@@ -15,7 +15,7 @@ class PelangganSeeder extends Seeder
             ['id_kelompok_pelanggan' => 1, 'nama_pelanggan' => 'Ahmad Fauzi',       'telepon' => '081234567001', 'alamat' => 'Jl. Merdeka No.1',   'created_by' => 1],
             ['id_kelompok_pelanggan' => 1, 'nama_pelanggan' => 'Siti Rahmawati',    'telepon' => '081234567002', 'alamat' => 'Jl. Sudirman No.5',  'created_by' => 1],
             ['id_kelompok_pelanggan' => 1, 'nama_pelanggan' => 'Budi Santoso',      'telepon' => '081234567003', 'alamat' => 'Jl. Pahlawan No.12', 'created_by' => 1],
-            ['id_kelompok_pelanggan' => 1, 'nama_pelanggan' => 'Dewi Lestari',      'telepon' => '081234567004', 'alamat' => 'Jl. Diponegoro No.3','created_by' => 1],
+            ['id_kelompok_pelanggan' => 1, 'nama_pelanggan' => 'Dewi Lestari',      'telepon' => '081234567004', 'alamat' => 'Jl. Diponegoro No.3', 'created_by' => 1],
             ['id_kelompok_pelanggan' => 1, 'nama_pelanggan' => 'Rizky Prasetyo',    'telepon' => '081234567005', 'alamat' => null,                  'created_by' => 1],
             // Guru & Staff
             ['id_kelompok_pelanggan' => 2, 'nama_pelanggan' => 'Drs. Hendra W.',    'telepon' => '082345678001', 'alamat' => 'Jl. Guru No.10',      'created_by' => 1],
