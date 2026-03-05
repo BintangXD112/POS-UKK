@@ -317,9 +317,3 @@ npm run types
 Proyek ini dibuat untuk keperluan **UKK (Uji Kompetensi Keahlian)** dan tidak memiliki lisensi komersial terbuka.
 
 ---
-
-<div align="center">
-
-Dibuat dengan ❤️ untuk koperasi sekolah Indonesia
-
-</div>
