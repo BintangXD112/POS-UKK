@@ -111,7 +111,10 @@ class PenjualanController extends Controller
 
         ActivityLogger::log('create', 'Penjualan', 'Transaksi penjualan baru disimpan.');
 
-        return back()->with('success', 'Transaksi berhasil disimpan.');
+        return back()->with([
+            'success' => 'Transaksi berhasil disimpan.',
+            'print_id' => $penjualan->id_penjualan,
+        ]);
     }
 
     public function show(Penjualan $penjualan): Response

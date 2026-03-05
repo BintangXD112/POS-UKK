@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
@@ -19,6 +20,15 @@ interface Props {
 
 export default function PosStruk({ penjualan }: Props) {
     const handlePrint = () => window.print();
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('print') === 'true') {
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+    }, []);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

@@ -33,7 +33,7 @@ export function FlashMessage() {
 
     return (
         <div
-            className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl px-5 py-3.5 shadow-xl border text-sm font-medium transition-all duration-300 will-change-transform max-w-sm ${isLeaving ? 'animate-slide-out-right opacity-0' : 'animate-slide-in-right opacity-100'
+            className={`fixed top-24 right-6 z-50 flex items-center gap-3 rounded-xl px-5 py-3.5 shadow-xl border text-sm font-medium transition-all duration-300 will-change-transform max-w-sm ${isLeaving ? 'animate-slide-out-right opacity-0' : 'animate-slide-in-right opacity-100'
                 } ${message.type === 'success'
                     ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/30 dark:border-emerald-700 dark:text-emerald-300'
                     : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300'

@@ -75,11 +75,16 @@ export default function PosIndex({ barang, pelanggan }: Props) {
             cara_bayar: caraBayar,
             items: cart as any,
         }, {
-            onSuccess: () => {
+            onSuccess: (page) => {
                 setCart([]);
                 setBayar('');
                 setSelectedPelanggan('');
                 setProcessing(false);
+
+                const printId = (page.props.flash as any)?.print_id;
+                if (printId) {
+                    window.open(`/pos/struk/${printId}?print=true`, '_blank');
+                }
             },
             onError: () => setProcessing(false),
         });
