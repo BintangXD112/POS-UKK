@@ -72,7 +72,9 @@ class PenjualanController extends Controller
         $sekolahId = $user->id_sekolah; // null untuk SuperAdmin — transaksi tanpa sekolah (global)
         $totalFaktur = collect($validated['items'])->sum('subtotal');
 
-        DB::transaction(function () use ($validated, $user, $sekolahId, $totalFaktur) {
+        $penjualan = null; // inisialisasi sebelum closure
+
+        DB::transaction(function () use ($validated, $user, $sekolahId, $totalFaktur, &$penjualan) {
             $penjualan = Penjualan::create([
                 'id_sekolah' => $sekolahId,
                 'id_user' => $user->id_user,

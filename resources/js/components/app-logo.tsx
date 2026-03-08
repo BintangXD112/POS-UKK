@@ -11,7 +11,7 @@ export default function AppLogo() {
                     POS Koperasi
                 </span>
                 <span className="truncate text-xs text-muted-foreground leading-tight">
-                    Manajemen &amp; Penjualan
+                    POS Koperasi SMK 
                 </span>
             </div>
         </>

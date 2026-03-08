@@ -44,31 +44,31 @@ export function AppSidebar() {
             title: 'Kategori',
             href: '/kategori',
             icon: Tag,
-            roles: ['super admin', 'admin'],
+            roles: [ 'admin'],
         },
         {
             title: 'Pelanggan',
             href: '/pelanggan',
             icon: UserCheck,
-            roles: ['super admin', 'admin'],
+            roles: [ 'admin'],
         },
         {
             title: 'Supplier',
             href: '/supplier',
             icon: Truck,
-            roles: ['super admin', 'admin'],
+            roles: [ 'admin'],
         },
         {
             title: 'Barang',
             href: '/barang',
             icon: Package,
-            roles: ['super admin', 'admin'],
+            roles: [ 'admin'],
         },
         {
             title: 'Pembelian',
             href: '/pembelian',
             icon: ShoppingCart,
-            roles: ['super admin', 'admin'],
+            roles: [ 'admin'],
         },
         // Super Admin + Kasir
         {
@@ -82,19 +82,19 @@ export function AppSidebar() {
             title: 'Laporan Penjualan',
             href: '/laporan/penjualan',
             icon: BarChart2,
-            roles: ['super admin', 'admin'],
+            roles: [ 'admin'],
         },
         {
             title: 'Laporan Pembelian',
             href: '/laporan/pembelian',
             icon: Receipt,
-            roles: ['super admin', 'admin'],
+            roles: [ 'admin'],
         },
         {
             title: 'Rekap Transaksi',
             href: '/penjualan',
             icon: CreditCard,
-            roles: ['super admin', 'admin'],
+            roles: [ 'admin'],
         },
     ];
 
