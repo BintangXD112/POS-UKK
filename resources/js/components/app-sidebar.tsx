@@ -14,6 +14,8 @@ import type { NavItem } from '@/types';
 import type { SharedProps } from '@/types/auth';
 import AppLogo from './app-logo';
 
+import type { NavGroup } from '@/components/nav-main';
+
 type ExtendedNavItem = NavItem & { readOnly?: boolean };
 
 export function AppSidebar() {
@@ -25,50 +27,99 @@ export function AppSidebar() {
     const isKasir      = role === 'kasir';
 
     // ── Super Admin Nav ──────────────────────────────────────────────────────
-    const superAdminNav: ExtendedNavItem[] = [
-        { title: 'Dashboard',          href: '/dashboard',       icon: LayoutGrid },
-        { title: 'Data Sekolah',        href: '/sekolah',         icon: School },
-        { title: 'Manajemen User',      href: '/users',           icon: Users },
-        // Read-only pages — super admin hanya bisa lihat
-        { title: 'Barang',              href: '/barang',          icon: Package,      readOnly: true },
-        { title: 'Kategori',            href: '/kategori',        icon: Tag,          readOnly: true },
-        { title: 'Pelanggan',           href: '/pelanggan',       icon: UserCheck,    readOnly: true },
-        { title: 'Supplier',            href: '/supplier',        icon: Truck,        readOnly: true },
-        { title: 'Pembelian',           href: '/pembelian',       icon: ShoppingCart, readOnly: true },
-        { title: 'Rekap Transaksi',     href: '/penjualan',       icon: CreditCard,   readOnly: true },
-        { title: 'Laporan Penjualan',   href: '/laporan/penjualan', icon: BarChart2,  readOnly: true },
-        { title: 'Laporan Pembelian',   href: '/laporan/pembelian', icon: Receipt,    readOnly: true },
-        { title: 'Activity Log',        href: '/activity-log',    icon: ClipboardList },
+    const superAdminNav: NavGroup[] = [
+        {
+            title: 'Beranda',
+            items: [
+                { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
+                { title: 'Activity Log', href: '/activity-log', icon: ClipboardList },
+            ]
+        },
+        {
+            title: 'Data Master',
+            items: [
+                { title: 'Data Sekolah', href: '/sekolah', icon: School },
+                { title: 'Kategori', href: '/kategori', icon: Tag, readOnly: true },
+                { title: 'Barang', href: '/barang', icon: Package, readOnly: true },
+                { title: 'Pelanggan', href: '/pelanggan', icon: UserCheck, readOnly: true },
+                { title: 'Supplier', href: '/supplier', icon: Truck, readOnly: true },
+            ]
+        },
+        {
+            title: 'Transaksi & Laporan',
+            items: [
+                { title: 'Pembelian', href: '/pembelian', icon: ShoppingCart, readOnly: true },
+                { title: 'Rekap Transaksi', href: '/penjualan', icon: CreditCard, readOnly: true },
+                { title: 'Laporan Penjualan', href: '/laporan/penjualan', icon: BarChart2, readOnly: true },
+                { title: 'Laporan Pembelian', href: '/laporan/pembelian', icon: Receipt, readOnly: true },
+            ]
+        },
+        {
+            title: 'Pengaturan',
+            items: [
+                { title: 'Manajemen User', href: '/users', icon: Users },
+            ]
+        }
     ];
 
     // ── Admin Nav ────────────────────────────────────────────────────────────
-    const adminNav: ExtendedNavItem[] = [
-        { title: 'Dashboard',           href: '/dashboard',       icon: LayoutGrid },
-        { title: 'Manajemen User',      href: '/users',           icon: Users },
-        { title: 'Kategori',            href: '/kategori',        icon: Tag },
-        { title: 'Pelanggan',           href: '/pelanggan',       icon: UserCheck },
-        { title: 'Supplier',            href: '/supplier',        icon: Truck },
-        { title: 'Barang',              href: '/barang',          icon: Package },
-        { title: 'Pembelian',           href: '/pembelian',       icon: ShoppingCart },
-        { title: 'Rekap Transaksi',     href: '/penjualan',       icon: CreditCard },
-        { title: 'Laporan Penjualan',   href: '/laporan/penjualan', icon: BarChart2 },
-        { title: 'Laporan Pembelian',   href: '/laporan/pembelian', icon: Receipt },
+    const adminNav: NavGroup[] = [
+        {
+            title: 'Beranda',
+            items: [
+                { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
+            ]
+        },
+        {
+            title: 'Data Master',
+            items: [
+                { title: 'Kategori', href: '/kategori', icon: Tag },
+                { title: 'Barang', href: '/barang', icon: Package },
+                { title: 'Pelanggan', href: '/pelanggan', icon: UserCheck },
+                { title: 'Supplier', href: '/supplier', icon: Truck },
+            ]
+        },
+        {
+            title: 'Transaksi & Laporan',
+            items: [
+                { title: 'Pembelian', href: '/pembelian', icon: ShoppingCart },
+                { title: 'Rekap Transaksi', href: '/penjualan', icon: CreditCard },
+                { title: 'Laporan Penjualan', href: '/laporan/penjualan', icon: BarChart2 },
+                { title: 'Laporan Pembelian', href: '/laporan/pembelian', icon: Receipt },
+            ]
+        },
+        {
+            title: 'Pengaturan',
+            items: [
+                { title: 'Manajemen User', href: '/users', icon: Users },
+            ]
+        }
     ];
 
     // ── Kasir Nav ────────────────────────────────────────────────────────────
-    const kasirNav: ExtendedNavItem[] = [
-        { title: 'Dashboard',           href: '/dashboard',  icon: LayoutGrid },
-        { title: 'POS Kasir',           href: '/pos',        icon: Store },
-        { title: 'Riwayat Transaksi',   href: '/penjualan',  icon: Receipt,   readOnly: true },
+    const kasirNav: NavGroup[] = [
+        {
+            title: 'Beranda',
+            items: [
+                { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
+            ]
+        },
+        {
+            title: 'Transaksi',
+            items: [
+                { title: 'POS Kasir', href: '/pos', icon: Store },
+                { title: 'Riwayat Transaksi', href: '/penjualan', icon: Receipt, readOnly: true },
+            ]
+        }
     ];
 
-    const navItems: ExtendedNavItem[] = isSuperAdmin
+    const navGroups: NavGroup[] = isSuperAdmin
         ? superAdminNav
         : isAdmin
         ? adminNav
         : isKasir
         ? kasirNav
-        : [{ title: 'Dashboard', href: '/dashboard', icon: LayoutGrid }];
+        : [{ title: 'Beranda', items: [{ title: 'Dashboard', href: '/dashboard', icon: LayoutGrid }] }];
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -85,7 +136,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent className="scrollbar-thin">
-                <NavMain items={navItems} />
+                <NavMain groups={navGroups} />
             </SidebarContent>
 
             <SidebarFooter className="border-t border-sidebar-border/60 pt-2">

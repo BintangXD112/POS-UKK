@@ -1,4 +1,4 @@
-    import { usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { LogOut, Settings, User, ChevronsUpDown } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import {

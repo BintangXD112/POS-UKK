@@ -69,6 +69,10 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:super admin,admin,kasir'])->group(function () {
         Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
         Route::get('/pos/struk/{penjualan}', [PenjualanController::class, 'show'])->name('pos.struk');
+    });
+
+    // ── Kasir & Admin: Lunasi hutang ──────────────────────────────────────────
+    Route::middleware(['role:admin,kasir'])->group(function () {
         Route::post('/penjualan/{penjualan}/lunasi', [PenjualanController::class, 'lunasi'])->name('penjualan.lunasi');
     });
 

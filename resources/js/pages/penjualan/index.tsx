@@ -29,6 +29,7 @@ export default function PenjualanIndex({ penjualan, isReadOnly, sekolahList, sel
     
     const { auth } = usePage<SharedProps>().props;
     const isKasir = auth?.user?.role?.nama_role === 'kasir';
+    const isSuperAdmin = auth?.user?.role?.nama_role === 'super admin';
 
     const handlePrint = () => {
         document.title = 'Rekap Transaksi Penjualan';
@@ -162,16 +163,18 @@ export default function PenjualanIndex({ penjualan, isReadOnly, sekolahList, sel
                                         <td className="px-5 py-3.5">
                                             <div className="flex items-center gap-1">
                                                 {/* Tombol Lunasi Hutang */}
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="sm" 
-                                                    className="h-8 w-8 p-0 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 disabled:opacity-30 disabled:pointer-events-none" 
-                                                    disabled={p.status_pembayaran !== 'hutang'}
-                                                    title={p.status_pembayaran === 'hutang' ? "Lunasi Hutang" : ""}
-                                                    onClick={() => setLunasiData(p.id_penjualan)}
-                                                >
-                                                    <Wallet className="h-3.5 w-3.5" />
-                                                </Button>
+                                                {!isSuperAdmin && (
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="sm" 
+                                                        className="h-8 w-8 p-0 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 disabled:opacity-30 disabled:pointer-events-none" 
+                                                        disabled={p.status_pembayaran !== 'hutang'}
+                                                        title={p.status_pembayaran === 'hutang' ? "Lunasi Hutang" : ""}
+                                                        onClick={() => setLunasiData(p.id_penjualan)}
+                                                    >
+                                                        <Wallet className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                )}
 
                                                 {/* Tombol lihat struk — selalu boleh dilihat */}
                                                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:text-teal-600" asChild>
