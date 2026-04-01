@@ -13,8 +13,8 @@ class LaporanController extends Controller
     public function penjualan(Request $request): Response
     {
         $sekolahId = $request->user()->id_sekolah;
-        $dateFrom = $request->get('date_from', now()->startOfMonth()->format('Y-m-d'));
-        $dateTo = $request->get('date_to', now()->format('Y-m-d'));
+        $dateFrom = $request->input('date_from', now()->startOfMonth()->format('Y-m-d'));
+        $dateTo = $request->input('date_to', now()->format('Y-m-d'));
 
         $penjualan = Penjualan::with(['user', 'pelanggan', 'detail.barang'])
             ->when($sekolahId, fn ($q) => $q->where('id_sekolah', $sekolahId))
@@ -33,8 +33,8 @@ class LaporanController extends Controller
     public function pembelian(Request $request): Response
     {
         $sekolahId = $request->user()->id_sekolah;
-        $dateFrom = $request->get('date_from', now()->startOfMonth()->format('Y-m-d'));
-        $dateTo = $request->get('date_to', now()->format('Y-m-d'));
+        $dateFrom = $request->input('date_from', now()->startOfMonth()->format('Y-m-d'));
+        $dateTo = $request->input('date_to', now()->format('Y-m-d'));
 
         $pembelian = Pembelian::with(['supplier', 'user', 'detail.barang'])
             ->when($sekolahId, fn ($q) => $q->where('id_sekolah', $sekolahId))

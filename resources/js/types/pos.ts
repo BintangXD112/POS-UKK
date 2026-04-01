@@ -70,6 +70,7 @@ export interface Barang {
     id_sekolah: number;
     barcode: string;
     nama: string;
+    icon: string | null;
     id_kategori: number;
     id_kelompok_kategori: number;
     id_supplier: number;
@@ -132,7 +133,7 @@ export interface Penjualan {
     total_faktur: number;
     total_bayar: number;
     kembalian: number;
-    status_pembayaran: 'sudah bayar' | 'belum bayar';
+    status_pembayaran: 'sudah bayar' | 'belum bayar' | 'hutang';
     jenis_transaksi: 'tunai' | 'kredit' | null;
     cara_bayar: string | null;
     note: string | null;

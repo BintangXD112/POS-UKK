@@ -16,59 +16,80 @@ use Illuminate\Support\Facades\Route;
 // ── Halaman utama ──────────────────────────────────────────────────────────────
 Route::get('/', fn () => redirect()->route('dashboard'))->name('home');
 
-// ── Auth route dikelola Fortify (login/logout) ─────────────────────────────────
-
-// ── Semua route terproteksi ────────────────────────────────────────────────────
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard
+    // ── Dashboard — semua role ─────────────────────────────────────────────────
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ── Super Admin only ────────────────────────────────────────────────────────
-    Route::middleware(['role:super admin'])->prefix('sekolah')->name('sekolah.')->group(function () {
-        Route::get('/', [SekolahController::class, 'index'])->name('index');
-        Route::post('/', [SekolahController::class, 'store'])->name('store');
-        Route::put('/{sekolah}', [SekolahController::class, 'update'])->name('update');
-        Route::delete('/{sekolah}', [SekolahController::class, 'destroy'])->name('destroy');
+    // ── Super Admin only: Sekolah (full CRUD) & Activity Log ──────────────────
+    Route::middleware(['role:super admin'])->group(function () {
+        Route::prefix('sekolah')->name('sekolah.')->group(function () {
+            Route::get('/', [SekolahController::class, 'index'])->name('index');
+            Route::post('/', [SekolahController::class, 'store'])->name('store');
+            Route::put('/{sekolah}', [SekolahController::class, 'update'])->name('update');
+            Route::delete('/{sekolah}', [SekolahController::class, 'destroy'])->name('destroy');
+        });
+        Route::get('/activity-log', [ActivityLogController::class, 'index'])->name('activity-log.index');
     });
 
-    // Activity Log (super admin only)
-    Route::middleware(['role:super admin'])
-        ->get('/activity-log', [ActivityLogController::class, 'index'])
-        ->name('activity-log.index');
+    // ── Super Admin + Admin: Manajemen User (keduanya full CRUD) ──────────────
+    Route::middleware(['role:super admin,admin'])->prefix('users')->name('users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::put('/{user}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+    });
 
-    // ── Super Admin + Admin ────────────────────────────────────────────────────
+    // ── Super Admin + Admin: halaman operasional ──────────────────────────────
+    // GET routes — semua bisa lihat. Controller menentukan isReadOnly berdasar role.
     Route::middleware(['role:super admin,admin'])->group(function () {
 
-        // Users
-        Route::prefix('users')->name('users.')->group(function () {
-            Route::get('/', [UserController::class, 'index'])->name('index');
-            Route::post('/', [UserController::class, 'store'])->name('store');
-            Route::put('/{user}', [UserController::class, 'update'])->name('update');
-            Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
-        });
+        // Kategori
+        Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
 
-        // Kategori & Kelompok Kategori
+        // Pelanggan
+        Route::get('/pelanggan', [PelangganController::class, 'index'])->name('pelanggan.index');
+
+        // Supplier
+        Route::get('/supplier', [SupplierController::class, 'index'])->name('supplier.index');
+
+        // Barang
+        Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
+
+        // Pembelian
+        Route::get('/pembelian', [PembelianController::class, 'index'])->name('pembelian.index');
+        Route::get('/pembelian/{pembelian}', [PembelianController::class, 'show'])->name('pembelian.show');
+
+        // Laporan
+        Route::get('/laporan/penjualan', [LaporanController::class, 'penjualan'])->name('laporan.penjualan');
+        Route::get('/laporan/pembelian', [LaporanController::class, 'pembelian'])->name('laporan.pembelian');
+    });
+
+    // ── Rekap Transaksi & Struk — Super Admin, Admin, dan Kasir bisa lihat ─────
+    Route::middleware(['role:super admin,admin,kasir'])->group(function () {
+        Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
+        Route::get('/pos/struk/{penjualan}', [PenjualanController::class, 'show'])->name('pos.struk');
+        Route::post('/penjualan/{penjualan}/lunasi', [PenjualanController::class, 'lunasi'])->name('penjualan.lunasi');
+    });
+
+    // ── Admin only: semua aksi TULIS (POST/PUT/DELETE) operasional ────────────
+    Route::middleware(['role:admin'])->group(function () {
+
+        // Kategori & Kelompok
         Route::prefix('kategori')->name('kategori.')->group(function () {
-            Route::get('/', [KategoriController::class, 'index'])->name('index');
-            // Kelompok
             Route::post('/kelompok', [KategoriController::class, 'storeKelompok'])->name('kelompok.store');
             Route::put('/kelompok/{kelompok}', [KategoriController::class, 'updateKelompok'])->name('kelompok.update');
             Route::delete('/kelompok/{kelompok}', [KategoriController::class, 'destroyKelompok'])->name('kelompok.destroy');
-            // Kategori
             Route::post('/', [KategoriController::class, 'store'])->name('store');
             Route::put('/{kategori}', [KategoriController::class, 'update'])->name('update');
             Route::delete('/{kategori}', [KategoriController::class, 'destroy'])->name('destroy');
         });
 
-        // Pelanggan & Kelompok Pelanggan
+        // Pelanggan & Kelompok
         Route::prefix('pelanggan')->name('pelanggan.')->group(function () {
-            Route::get('/', [PelangganController::class, 'index'])->name('index');
-            // Kelompok
             Route::post('/kelompok', [PelangganController::class, 'storeKelompok'])->name('kelompok.store');
             Route::put('/kelompok/{kelompok}', [PelangganController::class, 'updateKelompok'])->name('kelompok.update');
             Route::delete('/kelompok/{kelompok}', [PelangganController::class, 'destroyKelompok'])->name('kelompok.destroy');
-            // Pelanggan
             Route::post('/', [PelangganController::class, 'store'])->name('store');
             Route::put('/{pelanggan}', [PelangganController::class, 'update'])->name('update');
             Route::delete('/{pelanggan}', [PelangganController::class, 'destroy'])->name('destroy');
@@ -76,7 +97,6 @@ Route::middleware(['auth'])->group(function () {
 
         // Supplier
         Route::prefix('supplier')->name('supplier.')->group(function () {
-            Route::get('/', [SupplierController::class, 'index'])->name('index');
             Route::post('/', [SupplierController::class, 'store'])->name('store');
             Route::put('/{supplier}', [SupplierController::class, 'update'])->name('update');
             Route::delete('/{supplier}', [SupplierController::class, 'destroy'])->name('destroy');
@@ -84,7 +104,6 @@ Route::middleware(['auth'])->group(function () {
 
         // Barang
         Route::prefix('barang')->name('barang.')->group(function () {
-            Route::get('/', [BarangController::class, 'index'])->name('index');
             Route::post('/', [BarangController::class, 'store'])->name('store');
             Route::put('/{barang}', [BarangController::class, 'update'])->name('update');
             Route::delete('/{barang}', [BarangController::class, 'destroy'])->name('destroy');
@@ -92,28 +111,18 @@ Route::middleware(['auth'])->group(function () {
 
         // Pembelian
         Route::prefix('pembelian')->name('pembelian.')->group(function () {
-            Route::get('/', [PembelianController::class, 'index'])->name('index');
-            Route::get('/{pembelian}', [PembelianController::class, 'show'])->name('show');
             Route::post('/', [PembelianController::class, 'store'])->name('store');
             Route::delete('/{pembelian}', [PembelianController::class, 'destroy'])->name('destroy');
         });
 
-        // Laporan
-        Route::prefix('laporan')->name('laporan.')->group(function () {
-            Route::get('/penjualan', [LaporanController::class, 'penjualan'])->name('penjualan');
-            Route::get('/pembelian', [LaporanController::class, 'pembelian'])->name('pembelian');
-        });
-
-        // Penjualan — list (Admin bisa lihat)
-        Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
+        // Penjualan delete
         Route::delete('/penjualan/{penjualan}', [PenjualanController::class, 'destroy'])->name('penjualan.destroy');
     });
 
-    // ── Super Admin + Kasir (POS) ──────────────────────────────────────────────
-    Route::middleware(['role:super admin,kasir'])->group(function () {
+    // ── Kasir only: POS (transaksi baru) ─────────────────────────────────────
+    Route::middleware(['role:kasir'])->group(function () {
         Route::get('/pos', [PenjualanController::class, 'pos'])->name('pos.index');
         Route::post('/pos', [PenjualanController::class, 'store'])->name('pos.store');
-        Route::get('/pos/struk/{penjualan}', [PenjualanController::class, 'show'])->name('pos.struk');
     });
 });
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use App\Models\DetailPembelian;
 use App\Models\Pembelian;
+use App\Models\Sekolah;
 use App\Models\Supplier;
 use App\Services\ActivityLogger;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -16,10 +17,33 @@ use Inertia\Response;
 
 class PembelianController extends Controller
 {
+    /**
+     * Generate nomor faktur otomatis: PBL-YYYYMMDD-XXXX
+     * XXXX = urutan transaksi pada hari itu (per sekolah).
+     */
+    private function generateNomorFaktur(int $sekolahId): string
+    {
+        $date   = now()->format('Ymd');
+        $prefix = "PBL-{$date}-";
+
+        $last = Pembelian::where('id_sekolah', $sekolahId)
+            ->where('nomor_faktur', 'like', "{$prefix}%")
+            ->orderByDesc('nomor_faktur')
+            ->value('nomor_faktur');
+
+        $seq = $last ? ((int) substr($last, strlen($prefix))) + 1 : 1;
+
+        return $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
+    }
+
     public function index(Request $request): Response
     {
-        $user = $request->user();
-        $sekolahId = $user->id_sekolah;
+        $user         = $request->user();
+        $isSuperAdmin = $user->role?->nama_role === 'super admin';
+
+        $sekolahId = $isSuperAdmin
+            ? ($request->integer('id_sekolah') ?: null)
+            : $user->id_sekolah;
 
         $pembelian = Pembelian::with(['supplier', 'user'])
             ->when($sekolahId, fn ($q) => $q->where('id_sekolah', $sekolahId))
@@ -31,10 +55,19 @@ class PembelianController extends Controller
         $barang = Barang::when($sekolahId, fn ($q) => $q->where('id_sekolah', $sekolahId))
             ->where('is_active', 1)->orderBy('nama')->get();
 
+        // Generate preview nomor faktur berikutnya (hanya untuk admin)
+        $nextNomorFaktur = !$isSuperAdmin && $sekolahId
+            ? $this->generateNomorFaktur($sekolahId)
+            : null;
+
         return Inertia::render('pembelian/index', [
-            'pembelian' => $pembelian,
-            'suppliers' => $suppliers,
-            'barang' => $barang,
+            'pembelian'          => $pembelian,
+            'suppliers'          => $suppliers,
+            'barang'             => $barang,
+            'isReadOnly'         => $isSuperAdmin,
+            'sekolahList'        => $isSuperAdmin ? Sekolah::orderBy('nama_sekolah')->get(['id_sekolah', 'nama_sekolah']) : [],
+            'selectedSekolahId'  => $sekolahId,
+            'nextNomorFaktur'    => $nextNomorFaktur,
         ]);
     }
 
@@ -48,18 +81,20 @@ class PembelianController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'id_supplier' => 'required|exists:tb_supplier,id_supplier',
-            'nomor_faktur' => 'required|string|max:50',
-            'tanggal_faktur' => 'required|date',
-            'jenis_transaksi' => 'required|in:tunai,kredit',
-            'cara_bayar' => 'nullable|string|max:50',
-            'note' => 'nullable|string',
-            'items' => 'required|array|min:1',
-            'items.*.id_barang' => 'required|exists:tb_barang,id_barang',
-            'items.*.jumlah' => 'required|integer|min:1',
-            'items.*.harga_beli' => 'required|numeric|min:0',
-            'items.*.satuan' => 'required|string|max:20',
+            'id_supplier'           => 'required|exists:tb_supplier,id_supplier',
+            'tanggal_faktur'        => 'required|date',
+            'jenis_transaksi'       => 'required|in:tunai,kredit',
+            'cara_bayar'            => 'nullable|string|max:50',
+            'note'                  => 'nullable|string',
+            'items'                 => 'required|array|min:1',
+            'items.*.id_barang'     => 'required|exists:tb_barang,id_barang',
+            'items.*.jumlah'        => 'required|integer|min:1',
+            'items.*.harga_beli'    => 'required|numeric|min:0',
+            'items.*.satuan'        => 'required|string|max:20',
         ]);
+
+        // Auto-generate nomor faktur — tidak dari input user
+        $validated['nomor_faktur'] = $this->generateNomorFaktur($request->user()->id_sekolah);
 
         $user = $request->user();
         $sekolahId = $user->id_sekolah;

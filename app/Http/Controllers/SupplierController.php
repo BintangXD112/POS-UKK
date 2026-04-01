@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sekolah;
 use App\Models\Supplier;
 use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
@@ -13,15 +14,24 @@ class SupplierController extends Controller
 {
     public function index(Request $request): Response
     {
-        $user = $request->user();
-        $sekolahId = $user->id_sekolah;
+        $user         = $request->user();
+        $isSuperAdmin = $user->role?->nama_role === 'super admin';
+
+        $sekolahId = $isSuperAdmin
+            ? ($request->integer('id_sekolah') ?: null)
+            : $user->id_sekolah;
 
         $query = Supplier::orderBy('nama');
         if ($sekolahId) {
             $query->where('id_sekolah', $sekolahId);
         }
 
-        return Inertia::render('supplier/index', ['suppliers' => $query->get()]);
+        return Inertia::render('supplier/index', [
+            'suppliers'          => $query->get(),
+            'isReadOnly'         => $isSuperAdmin,
+            'sekolahList'        => $isSuperAdmin ? Sekolah::orderBy('nama_sekolah')->get(['id_sekolah', 'nama_sekolah']) : [],
+            'selectedSekolahId'  => $sekolahId,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse

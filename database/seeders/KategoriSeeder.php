@@ -31,5 +31,18 @@ class KategoriSeeder extends Seeder
         foreach ($kategori as $data) {
             DB::table('tb_kategori')->insert($data);
         }
+
+        $faker = \Faker\Factory::create('id_ID');
+        $autoKategori = [];
+        
+        for ($i = 0; $i < 40; $i++) {
+            $autoKategori[] = [
+                'id_kelompok' => $faker->numberBetween(1, 4),
+                'nama' => ucwords($faker->unique()->words(2, true)) . ' ' . $i,
+                'created_by' => 1,
+            ];
+        }
+
+        DB::table('tb_kategori')->insert($autoKategori);
     }
 }

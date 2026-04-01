@@ -2,11 +2,11 @@ import { usePage } from '@inertiajs/react';
 import { ReactNode } from 'react';
 
 export function PageTransition({ children }: { children: ReactNode }) {
-    const { url } = usePage();
+    const { component } = usePage();
 
     return (
         <div
-            key={url}
+            key={component}
             className="w-full flex-1 animate-page-in will-change-transform"
         >
             {children}

@@ -45,10 +45,10 @@ export default function PembelianShow({ pembelian }: Props) {
 
                 {/* Header card */}
                 <div className="rounded-2xl border bg-white dark:bg-neutral-900 dark:border-neutral-800 shadow-sm overflow-hidden">
-                    <div className="bg-orange-500 text-white px-6 py-5">
+                    <div className="bg-teal-600 text-white px-6 py-5">
                         <div className="flex items-start justify-between">
                             <div>
-                                <p className="text-xs text-orange-200 uppercase tracking-wider font-medium">No. Faktur</p>
+                                <p className="text-xs text-teal-200 uppercase tracking-wider font-medium">No. Faktur</p>
                                 <p className="text-2xl font-bold font-mono mt-1">{pembelian.nomor_faktur}</p>
                             </div>
                             <span className="inline-flex rounded-full px-3 py-1 text-xs font-medium bg-white/20 text-white capitalize">
@@ -119,7 +119,7 @@ export default function PembelianShow({ pembelian }: Props) {
                         <tfoot className="border-t dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
                             <tr>
                                 <td colSpan={4} className="px-5 py-3.5 text-sm font-semibold text-right">Total Pembelian:</td>
-                                <td className="px-5 py-3.5 font-bold text-right text-orange-600 text-base">
+                                <td className="px-5 py-3.5 font-bold text-right text-teal-600 text-base">
                                     {fmtRp(pembelian.total_bayar)}
                                 </td>
                             </tr>

@@ -22,7 +22,7 @@ class Barang extends Model
     const UPDATED_AT = 'updated_at';
 
     protected $fillable = [
-        'id_sekolah', 'barcode', 'nama', 'id_kategori', 'id_kelompok_kategori',
+        'id_sekolah', 'barcode', 'nama', 'icon', 'id_kategori', 'id_kelompok_kategori',
         'id_supplier', 'satuan', 'harga_beli', 'harga_jual', 'stok',
         'is_active', 'created_by', 'updated_by', 'deleted_by', 'is_delete',
     ];

@@ -43,7 +43,7 @@ export default function PosStruk({ penjualan }: Props) {
                             Kembali
                         </Link>
                     </Button>
-                    <Button onClick={handlePrint} className="gap-2 bg-violet-600 hover:bg-violet-700">
+                    <Button onClick={handlePrint} className="gap-2 bg-teal-600 hover:bg-teal-700">
                         <Printer className="h-4 w-4" />
                         Cetak Struk
                     </Button>
@@ -52,24 +52,25 @@ export default function PosStruk({ penjualan }: Props) {
                 {/* Receipt card */}
                 <div className="max-w-sm mx-auto bg-white dark:bg-neutral-900 rounded-2xl border dark:border-neutral-800 shadow-sm overflow-hidden print:shadow-none print:border-none print:max-w-full">
                     {/* Header */}
-                    <div className="bg-violet-600 text-white p-6 text-center">
+                    <div className="bg-teal-600 text-white p-6 text-center">
                         <h1 className="text-lg font-bold tracking-wide">
                             {penjualan.sekolah?.nama_sekolah ?? 'POS Koperasi'}
                         </h1>
                         {penjualan.sekolah?.alamat_sekolah && (
-                            <p className="text-xs text-violet-200 mt-1">{penjualan.sekolah.alamat_sekolah}</p>
+                            <p className="text-xs text-teal-200 mt-1">{penjualan.sekolah.alamat_sekolah}</p>
                         )}
-                        <p className="text-xs text-violet-200 mt-3 font-mono">
+                        <p className="text-xs text-teal-200 mt-3 font-mono">
                             #{String(penjualan.id_penjualan).padStart(6, '0')}
                         </p>
-                        <p className="text-xs text-violet-200 mt-0.5">
-                            {new Date(penjualan.tanggal_penjualan).toLocaleString('id-ID', {
-                                day: '2-digit',
-                                month: 'long',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                            })}
+                        <p className="text-xs text-teal-200 mt-0.5">
+                        {new Date(penjualan.tanggal_penjualan).toLocaleString('id-ID', {
+                            timeZone: 'Asia/Jakarta',
+                            day: '2-digit',
+                            month: 'long',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        })}
                         </p>
                     </div>
 
@@ -91,6 +92,14 @@ export default function PosStruk({ penjualan }: Props) {
                                 <span className="font-medium capitalize">
                                     {penjualan.jenis_transaksi ?? '-'}
                                     {penjualan.cara_bayar ? ` · ${penjualan.cara_bayar}` : ''}
+                                </span>
+                            </div>
+                            <div className="flex justify-between mt-1">
+                                <span className="text-neutral-500">Status</span>
+                                <span className={`font-bold uppercase ${
+                                    penjualan.status_pembayaran === 'sudah bayar' ? 'text-emerald-600' : 'text-orange-600'
+                                }`}>
+                                    {penjualan.status_pembayaran === 'sudah bayar' ? 'LUNAS' : penjualan.status_pembayaran}
                                 </span>
                             </div>
                         </div>
@@ -129,8 +138,10 @@ export default function PosStruk({ penjualan }: Props) {
                                 <span>{fmtRp(penjualan.total_bayar)}</span>
                             </div>
                             <div className="flex justify-between font-bold text-base pt-1 border-t dark:border-neutral-700">
-                                <span>Kembalian</span>
-                                <span className="text-emerald-600">{fmtRp(penjualan.kembalian)}</span>
+                                <span>{Number(penjualan.kembalian) < 0 ? 'Hutang' : 'Kembalian'}</span>
+                                <span className={Number(penjualan.kembalian) < 0 ? 'text-red-500' : 'text-emerald-600'}>
+                                    {Number(penjualan.kembalian) < 0 ? fmtRp(Math.abs(Number(penjualan.kembalian))) : fmtRp(penjualan.kembalian)}
+                                </span>
                             </div>
                         </div>
 

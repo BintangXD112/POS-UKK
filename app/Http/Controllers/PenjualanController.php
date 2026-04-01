@@ -6,6 +6,7 @@ use App\Models\Barang;
 use App\Models\DetailPenjualan;
 use App\Models\Pelanggan;
 use App\Models\Penjualan;
+use App\Models\Sekolah;
 use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,14 +18,27 @@ class PenjualanController extends Controller
 {
     public function index(Request $request): Response
     {
-        $sekolahId = $request->user()->id_sekolah;
+        $user         = $request->user();
+        $roleName     = $user->role?->nama_role;
+        $isSuperAdmin = $roleName === 'super admin';
+        $isKasir      = $roleName === 'kasir';
+        $isReadOnly   = $isSuperAdmin || $isKasir;
+
+        $sekolahId = $isSuperAdmin
+            ? ($request->integer('id_sekolah') ?: null)
+            : $user->id_sekolah;
 
         $penjualan = Penjualan::with(['user', 'pelanggan'])
             ->when($sekolahId, fn ($q) => $q->where('id_sekolah', $sekolahId))
             ->orderByDesc('tanggal_penjualan')
             ->get();
 
-        return Inertia::render('penjualan/index', ['penjualan' => $penjualan]);
+        return Inertia::render('penjualan/index', [
+            'penjualan'          => $penjualan,
+            'isReadOnly'         => $isReadOnly,
+            'sekolahList'        => $isSuperAdmin ? Sekolah::orderBy('nama_sekolah')->get(['id_sekolah', 'nama_sekolah']) : [],
+            'selectedSekolahId'  => $sekolahId,
+        ]);
     }
 
     public function pos(Request $request): Response
@@ -81,8 +95,8 @@ class PenjualanController extends Controller
                 'id_pelanggan' => $validated['id_pelanggan'] ?? null,
                 'total_faktur' => $totalFaktur,
                 'total_bayar' => $validated['total_bayar'],
-                'kembalian' => max(0, $validated['total_bayar'] - $totalFaktur),
-                'status_pembayaran' => 'sudah bayar',
+                'kembalian' => $validated['total_bayar'] - $totalFaktur,
+                'status_pembayaran' => $validated['total_bayar'] < $totalFaktur ? 'hutang' : 'sudah bayar',
                 'jenis_transaksi' => $validated['jenis_transaksi'],
                 'cara_bayar' => $validated['cara_bayar'] ?? null,
                 'note' => $validated['note'] ?? null,
@@ -117,6 +131,23 @@ class PenjualanController extends Controller
             'success' => 'Transaksi berhasil disimpan.',
             'print_id' => $penjualan->id_penjualan,
         ]);
+    }
+
+    public function lunasi(Penjualan $penjualan): RedirectResponse
+    {
+        if ($penjualan->status_pembayaran !== 'hutang') {
+            return back()->with('error', 'Transaksi ini bukan hutang.');
+        }
+
+        $penjualan->update([
+            'total_bayar' => $penjualan->total_faktur,
+            'kembalian' => 0,
+            'status_pembayaran' => 'sudah bayar',
+        ]);
+
+        ActivityLogger::log('update', 'Penjualan', "Melunasi hutang transaksi ID: {$penjualan->id_penjualan}");
+
+        return back()->with('success', 'Hutang berhasil dilunasi.');
     }
 
     public function show(Penjualan $penjualan): Response

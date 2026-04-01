@@ -27,5 +27,20 @@ class PelangganSeeder extends Seeder
         foreach ($pelanggan as $data) {
             DB::table('tb_pelanggan')->insert($data);
         }
+
+        $faker = \Faker\Factory::create('id_ID');
+        $autoPelanggan = [];
+        
+        for ($i = 0; $i < 45; $i++) {
+            $autoPelanggan[] = [
+                'id_kelompok_pelanggan' => $faker->numberBetween(1, 3),
+                'nama_pelanggan' => $faker->name,
+                'telepon' => $faker->phoneNumber,
+                'alamat' => $faker->optional(0.7)->address,
+                'created_by' => 1,
+            ];
+        }
+
+        DB::table('tb_pelanggan')->insert($autoPelanggan);
     }
 }

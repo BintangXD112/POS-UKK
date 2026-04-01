@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Kategori;
 use App\Models\KelompokKategori;
+use App\Models\Sekolah;
 use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,8 +15,12 @@ class KategoriController extends Controller
 {
     public function index(Request $request): Response
     {
-        $user = $request->user();
-        $sekolahId = $user->id_sekolah;
+        $user         = $request->user();
+        $isSuperAdmin = $user->role?->nama_role === 'super admin';
+
+        $sekolahId = $isSuperAdmin
+            ? ($request->integer('id_sekolah') ?: null)
+            : $user->id_sekolah;
 
         $query = KelompokKategori::with(['kategori' => fn ($q) => $q->orderBy('nama')])
             ->orderBy('nama_kelompok');
@@ -23,7 +28,12 @@ class KategoriController extends Controller
             $query->where('id_sekolah', $sekolahId);
         }
 
-        return Inertia::render('kategori/index', ['kelompok' => $query->get()]);
+        return Inertia::render('kategori/index', [
+            'kelompok'           => $query->get(),
+            'isReadOnly'         => $isSuperAdmin,
+            'sekolahList'        => $isSuperAdmin ? Sekolah::orderBy('nama_sekolah')->get(['id_sekolah', 'nama_sekolah']) : [],
+            'selectedSekolahId'  => $sekolahId,
+        ]);
     }
 
     public function storeKelompok(Request $request): RedirectResponse
@@ -58,7 +68,7 @@ class KategoriController extends Controller
     public function destroyKelompok(KelompokKategori $kelompok): RedirectResponse
     {
         $nama = $kelompok->nama_kelompok;
-        $kelompok->kategori()->each(fn ($k) => $k->delete());
+        $kelompok->kategori()->each(fn (Kategori $k) => $k->delete());
         $kelompok->delete();
         ActivityLogger::log('delete', 'Kategori', "Menghapus kelompok kategori: {$nama}");
 

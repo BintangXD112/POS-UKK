@@ -1,12 +1,13 @@
-import { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import { Head, usePage } from '@inertiajs/react';
+import axios from 'axios';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Filter, LogIn, LogOut, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Search, Filter, LogIn, LogOut, Plus, Pencil, Trash2, Activity } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Activity Log', href: '/activity-log' }];
 
@@ -60,10 +61,17 @@ const MODULE_COLORS: Record<string, string> = {
 };
 
 function fmtDt(s: string) {
-    return new Date(s).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    return new Date(s).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
 export default function ActivityLogIndex({ logs, modules, filters }: Props) {
+    const page = usePage();
+    const [localLogs, setLocalLogs] = useState(logs);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setLocalLogs(logs);
+    }, [logs]);
     const [form, setForm] = useState({
         action: filters.action || '',
         module: filters.module || '',
@@ -72,44 +80,85 @@ export default function ActivityLogIndex({ logs, modules, filters }: Props) {
         date_to: filters.date_to || '',
     });
 
-    const handleFilter = () => {
+    const handleFilter = async () => {
         const params = Object.fromEntries(Object.entries(form).filter(([, v]) => v !== ''));
-        router.get('/activity-log', params, { preserveState: true });
+        fetchData(params);
     };
 
     const handleReset = () => {
         setForm({ action: '', module: '', search: '', date_from: '', date_to: '' });
-        router.get('/activity-log', {}, { preserveState: false });
+        fetchData({});
+    };
+
+    const fetchData = async (params: Record<string, string>) => {
+        setLoading(true);
+        try {
+            const res = await axios.get('/activity-log', {
+                params,
+                headers: {
+                    'X-Inertia': 'true',
+                    'X-Inertia-Version': page.version,
+                    'X-Inertia-Partial-Data': 'logs',
+                    'X-Inertia-Partial-Component': 'activity-log/index'
+                }
+            });
+            setLocalLogs(res.data.props.logs);
+            const queryString = new URLSearchParams(params).toString();
+            window.history.replaceState({}, '', `/activity-log${queryString ? `?${queryString}` : ''}`);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePageClick = async (url: string) => {
+        if (!url) return;
+        const paramsStr = url.split('?')[1] || '';
+        const params = Object.fromEntries(new URLSearchParams(paramsStr).entries());
+        fetchData(params);
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Activity Log" />
-            <div className="p-4 md:p-6 space-y-4">
+            <div className="p-4 md:p-6 space-y-5">
+                {/* Header */}
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-xl font-bold">Activity Log</h1>
-                        <p className="text-sm text-neutral-500 mt-0.5">Audit trail seluruh aktivitas aplikasi</p>
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/10 border border-teal-500/20">
+                            <Activity className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h1 className="text-xl font-bold tracking-tight">Activity Log</h1>
+                            </div>
+                            <p className="text-sm text-muted-foreground mt-0.5">Audit trail seluruh aktivitas aplikasi</p>
+                        </div>
                     </div>
-                    <p className="text-sm text-neutral-400">{logs.total.toLocaleString('id-ID')} entri</p>
+                    <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-100 dark:bg-teal-900/30 px-3 py-1 text-xs font-semibold text-teal-700 dark:text-teal-400 uppercase tracking-wide">
+                            {logs.total.toLocaleString('id-ID')} Entri
+                        </span>
+                    </div>
                 </div>
 
                 {/* Filter Bar */}
-                <div className="flex flex-wrap items-end gap-3 bg-white dark:bg-neutral-900 border dark:border-neutral-800 rounded-2xl p-4 shadow-sm print:hidden">
+                <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm print:hidden">
                     <div className="space-y-1.5">
-                        <Label className="text-xs">Dari Tanggal</Label>
-                        <Input type="date" className="h-8 w-36" value={form.date_from} onChange={e => setForm(f => ({ ...f, date_from: e.target.value }))} />
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Dari Tanggal</Label>
+                        <Input type="date" className="h-10 w-36 rounded-xl" value={form.date_from} onChange={e => setForm(f => ({ ...f, date_from: e.target.value }))} />
                     </div>
                     <div className="space-y-1.5">
-                        <Label className="text-xs">Sampai Tanggal</Label>
-                        <Input type="date" className="h-8 w-36" value={form.date_to} onChange={e => setForm(f => ({ ...f, date_to: e.target.value }))} />
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Sampai Tanggal</Label>
+                        <Input type="date" className="h-10 w-36 rounded-xl" value={form.date_to} onChange={e => setForm(f => ({ ...f, date_to: e.target.value }))} />
                     </div>
                     <div className="space-y-1.5">
-                        <Label className="text-xs">Aksi</Label>
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Aksi</Label>
                         <Select value={form.action} onValueChange={v => setForm(f => ({ ...f, action: v === 'all' ? '' : v }))}>
-                            <SelectTrigger className="h-8 w-28"><SelectValue placeholder="Semua" /></SelectTrigger>
+                            <SelectTrigger className="h-10 w-32 rounded-xl"><SelectValue placeholder="Semua Aksi" /></SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">Semua</SelectItem>
+                                <SelectItem value="all">Semua Aksi</SelectItem>
                                 <SelectItem value="login">Login</SelectItem>
                                 <SelectItem value="logout">Logout</SelectItem>
                                 <SelectItem value="create">Tambah</SelectItem>
@@ -119,88 +168,94 @@ export default function ActivityLogIndex({ logs, modules, filters }: Props) {
                         </Select>
                     </div>
                     <div className="space-y-1.5">
-                        <Label className="text-xs">Modul</Label>
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Modul</Label>
                         <Select value={form.module} onValueChange={v => setForm(f => ({ ...f, module: v === 'all' ? '' : v }))}>
-                            <SelectTrigger className="h-8 w-32"><SelectValue placeholder="Semua" /></SelectTrigger>
+                            <SelectTrigger className="h-10 w-36 rounded-xl"><SelectValue placeholder="Semua Modul" /></SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">Semua</SelectItem>
+                                <SelectItem value="all">Semua Modul</SelectItem>
                                 {modules.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="space-y-1.5">
-                        <Label className="text-xs">Cari User / Deskripsi</Label>
+                    <div className="space-y-1.5 flex-1 min-w-[200px]">
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Pencarian</Label>
                         <div className="relative">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-400" />
-                            <Input className="h-8 pl-8 w-48" placeholder="Ketik..." value={form.search} onChange={e => setForm(f => ({ ...f, search: e.target.value }))} onKeyDown={e => e.key === 'Enter' && handleFilter()} />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input className="h-10 pl-9 rounded-xl w-full" placeholder="Cari user atau deskripsi..." value={form.search} onChange={e => setForm(f => ({ ...f, search: e.target.value }))} onKeyDown={e => e.key === 'Enter' && handleFilter()} />
                         </div>
                     </div>
-                    <div className="flex gap-2">
-                        <Button size="sm" onClick={handleFilter} className="gap-1.5 h-8">
-                            <Filter className="h-3.5 w-3.5" /> Filter
+                    <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                        <Button onClick={handleFilter} disabled={loading} className="h-10 gap-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white shadow-sm transition-colors flex-1 sm:flex-none">
+                            <Filter className="h-4 w-4" /> {loading ? 'Memuat...' : 'Filter'}
                         </Button>
-                        <Button size="sm" variant="outline" onClick={handleReset} className="h-8">Reset</Button>
+                        <Button variant="outline" onClick={handleReset} disabled={loading} className="h-10 rounded-xl flex-1 sm:flex-none">Reset</Button>
                     </div>
                 </div>
 
                 {/* Table */}
-                <div className="rounded-2xl border bg-white dark:bg-neutral-900 dark:border-neutral-800 overflow-hidden shadow-sm">
-                    <table className="w-full text-sm">
-                        <thead className="border-b dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
-                            <tr className="text-left text-xs text-neutral-500">
-                                <th className="px-5 py-3.5 font-medium w-44">Waktu</th>
-                                <th className="px-5 py-3.5 font-medium">User</th>
-                                <th className="px-5 py-3.5 font-medium w-24">Aksi</th>
-                                <th className="px-5 py-3.5 font-medium w-28">Modul</th>
-                                <th className="px-5 py-3.5 font-medium">Deskripsi</th>
-                                <th className="px-5 py-3.5 font-medium w-32">IP Address</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {logs.data.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="text-center py-16 text-neutral-400">
-                                        Tidak ada aktivitas pada filter ini
-                                    </td>
+                <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-sm">
+                    <div className="h-[2px] bg-gradient-to-r from-teal-500/70 to-cyan-500/40" />
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b text-left bg-muted/30">
+                                    <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground w-44">Waktu</th>
+                                    <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">User</th>
+                                    <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground w-24">Aksi</th>
+                                    <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground w-28">Modul</th>
+                                    <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Deskripsi</th>
+                                    <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground w-32">IP Address</th>
                                 </tr>
-                            ) : logs.data.map(log => {
-                                const ac = ACTION_CONFIG[log.action];
-                                const mc = MODULE_COLORS[log.module] ?? 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400';
-                                return (
-                                    <tr key={log.id} className="border-b last:border-0 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors">
-                                        <td className="px-5 py-3 text-xs text-neutral-500 whitespace-nowrap">{fmtDt(log.created_at)}</td>
-                                        <td className="px-5 py-3 font-medium">{log.user_name ?? <span className="text-neutral-400 italic text-xs">—</span>}</td>
-                                        <td className="px-5 py-3">
-                                            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${ac.color}`}>
-                                                {ac.icon} {ac.label}
-                                            </span>
+                            </thead>
+                            <tbody className="divide-y divide-border/40">
+                                {localLogs.data.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6}>
+                                            <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
+                                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted"><Activity className="h-6 w-6" /></div>
+                                                <p className="text-sm font-medium">Tidak ada aktivitas pada filter ini</p>
+                                            </div>
                                         </td>
-                                        <td className="px-5 py-3">
-                                            <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${mc}`}>
-                                                {log.module}
-                                            </span>
-                                        </td>
-                                        <td className="px-5 py-3 text-neutral-600 dark:text-neutral-300">{log.description}</td>
-                                        <td className="px-5 py-3 text-xs font-mono text-neutral-400">{log.ip_address ?? '—'}</td>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                ) : localLogs.data.map(log => {
+                                    const ac = ACTION_CONFIG[log.action];
+                                    const mc = MODULE_COLORS[log.module] ?? 'bg-muted text-muted-foreground';
+                                    return (
+                                        <tr key={log.id} className={`hover:bg-muted/40 transition-colors duration-100 ${loading ? 'opacity-50' : ''}`}>
+                                            <td className="px-5 py-3.5 text-xs text-muted-foreground whitespace-nowrap">{fmtDt(log.created_at)}</td>
+                                            <td className="px-5 py-3.5 font-medium">{log.user_name ?? <span className="text-muted-foreground/50 italic text-xs">—</span>}</td>
+                                            <td className="px-5 py-3.5">
+                                                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold ${ac.color}`}>
+                                                    {ac.icon} {ac.label}
+                                                </span>
+                                            </td>
+                                            <td className="px-5 py-3.5">
+                                                <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${mc}`}>
+                                                    {log.module}
+                                                </span>
+                                            </td>
+                                            <td className="px-5 py-3.5 text-foreground/80 text-xs">{log.description}</td>
+                                            <td className="px-5 py-3.5 text-[11px] font-mono text-muted-foreground">{log.ip_address ?? '—'}</td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
 
                     {/* Pagination */}
-                    {logs.last_page > 1 && (
-                        <div className="flex items-center justify-between px-5 py-3 border-t dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
-                            <p className="text-xs text-neutral-400">
-                                Halaman {logs.current_page} dari {logs.last_page} ({logs.total.toLocaleString('id-ID')} entri)
+                    {localLogs.last_page > 1 && (
+                        <div className="flex items-center justify-between px-5 py-4 border-t border-border/40 bg-muted/10">
+                            <p className="text-xs font-medium text-muted-foreground">
+                                Halaman <span className="text-foreground">{localLogs.current_page}</span> dari <span className="text-foreground">{localLogs.last_page}</span> ({localLogs.total.toLocaleString('id-ID')} entri)
                             </p>
                             <div className="flex gap-1">
-                                {logs.links.map((link, i) => (
+                                {localLogs.links.map((link, i) => (
                                     <button
                                         key={i}
                                         disabled={!link.url}
-                                        onClick={() => link.url && router.visit(link.url)}
-                                        className={`px-3 py-1 rounded-lg text-xs transition-colors ${link.active ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900' : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'} ${!link.url ? 'opacity-40 cursor-not-allowed' : ''}`}
+                                        onClick={() => link.url && handlePageClick(link.url)}
+                                        className={`min-w-8 h-8 px-2 flex items-center justify-center rounded-xl text-xs font-medium transition-colors ${link.active ? 'bg-teal-600 text-white shadow-sm shadow-teal-500/20' : 'hover:bg-muted text-muted-foreground hover:text-foreground border border-transparent hover:border-border/60'} ${!link.url ? 'opacity-40 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}

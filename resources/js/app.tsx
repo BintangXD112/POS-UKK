@@ -24,7 +24,7 @@ createInertiaApp({
         );
     },
     progress: {
-        color: '#8b5cf6', // Violet-500 equivalent
+        color: '#14b8a6', // Teal-500
         showSpinner: false,
     },
 });

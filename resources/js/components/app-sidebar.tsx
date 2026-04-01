@@ -1,8 +1,8 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     LayoutGrid, Store, Users, Tag, UserCheck, Truck,
-    Package, ShoppingCart, CreditCard, BarChart2, School,
-    Receipt, ClipboardList,
+    Package, ShoppingCart, BarChart2, School,
+    Receipt, CreditCard, ClipboardList, Eye,
 } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -14,106 +14,68 @@ import type { NavItem } from '@/types';
 import type { SharedProps } from '@/types/auth';
 import AppLogo from './app-logo';
 
+type ExtendedNavItem = NavItem & { readOnly?: boolean };
+
 export function AppSidebar() {
     const { auth } = usePage<SharedProps>().props;
     const role = auth?.user?.role?.nama_role;
 
     const isSuperAdmin = role === 'super admin';
+    const isAdmin      = role === 'admin';
+    const isKasir      = role === 'kasir';
 
-    const allNavItems: (NavItem & { roles?: string[] })[] = [
-        {
-            title: 'Dashboard',
-            href: '/dashboard',
-            icon: LayoutGrid,
-        },
-        // Super Admin only
-        {
-            title: 'Data Sekolah',
-            href: '/sekolah',
-            icon: School,
-            roles: ['super admin'],
-        },
-        // Super Admin + Admin
-        {
-            title: 'Manajemen User',
-            href: '/users',
-            icon: Users,
-            roles: ['super admin', 'admin'],
-        },
-        {
-            title: 'Kategori',
-            href: '/kategori',
-            icon: Tag,
-            roles: [ 'admin'],
-        },
-        {
-            title: 'Pelanggan',
-            href: '/pelanggan',
-            icon: UserCheck,
-            roles: [ 'admin'],
-        },
-        {
-            title: 'Supplier',
-            href: '/supplier',
-            icon: Truck,
-            roles: [ 'admin'],
-        },
-        {
-            title: 'Barang',
-            href: '/barang',
-            icon: Package,
-            roles: [ 'admin'],
-        },
-        {
-            title: 'Pembelian',
-            href: '/pembelian',
-            icon: ShoppingCart,
-            roles: [ 'admin'],
-        },
-        // Super Admin + Kasir
-        {
-            title: 'POS Kasir',
-            href: '/pos',
-            icon: Store,
-            roles: ['super admin', 'kasir'],
-        },
-        // Super Admin + Admin
-        {
-            title: 'Laporan Penjualan',
-            href: '/laporan/penjualan',
-            icon: BarChart2,
-            roles: [ 'admin'],
-        },
-        {
-            title: 'Laporan Pembelian',
-            href: '/laporan/pembelian',
-            icon: Receipt,
-            roles: [ 'admin'],
-        },
-        {
-            title: 'Rekap Transaksi',
-            href: '/penjualan',
-            icon: CreditCard,
-            roles: [ 'admin'],
-        },
+    // ── Super Admin Nav ──────────────────────────────────────────────────────
+    const superAdminNav: ExtendedNavItem[] = [
+        { title: 'Dashboard',          href: '/dashboard',       icon: LayoutGrid },
+        { title: 'Data Sekolah',        href: '/sekolah',         icon: School },
+        { title: 'Manajemen User',      href: '/users',           icon: Users },
+        // Read-only pages — super admin hanya bisa lihat
+        { title: 'Barang',              href: '/barang',          icon: Package,      readOnly: true },
+        { title: 'Kategori',            href: '/kategori',        icon: Tag,          readOnly: true },
+        { title: 'Pelanggan',           href: '/pelanggan',       icon: UserCheck,    readOnly: true },
+        { title: 'Supplier',            href: '/supplier',        icon: Truck,        readOnly: true },
+        { title: 'Pembelian',           href: '/pembelian',       icon: ShoppingCart, readOnly: true },
+        { title: 'Rekap Transaksi',     href: '/penjualan',       icon: CreditCard,   readOnly: true },
+        { title: 'Laporan Penjualan',   href: '/laporan/penjualan', icon: BarChart2,  readOnly: true },
+        { title: 'Laporan Pembelian',   href: '/laporan/pembelian', icon: Receipt,    readOnly: true },
+        { title: 'Activity Log',        href: '/activity-log',    icon: ClipboardList },
     ];
 
-    const navItems = allNavItems.filter(item => {
-        if (!item.roles) return true;
-        return Boolean(role && item.roles.includes(role));
-    });
+    // ── Admin Nav ────────────────────────────────────────────────────────────
+    const adminNav: ExtendedNavItem[] = [
+        { title: 'Dashboard',           href: '/dashboard',       icon: LayoutGrid },
+        { title: 'Manajemen User',      href: '/users',           icon: Users },
+        { title: 'Kategori',            href: '/kategori',        icon: Tag },
+        { title: 'Pelanggan',           href: '/pelanggan',       icon: UserCheck },
+        { title: 'Supplier',            href: '/supplier',        icon: Truck },
+        { title: 'Barang',              href: '/barang',          icon: Package },
+        { title: 'Pembelian',           href: '/pembelian',       icon: ShoppingCart },
+        { title: 'Rekap Transaksi',     href: '/penjualan',       icon: CreditCard },
+        { title: 'Laporan Penjualan',   href: '/laporan/penjualan', icon: BarChart2 },
+        { title: 'Laporan Pembelian',   href: '/laporan/pembelian', icon: Receipt },
+    ];
 
-    // Activity Log — khusus super admin, ditampilkan paling bawah
-    const activityLogItems: NavItem[] = isSuperAdmin
-        ? [{ title: 'Activity Log', href: '/activity-log', icon: ClipboardList }]
-        : [];
+    // ── Kasir Nav ────────────────────────────────────────────────────────────
+    const kasirNav: ExtendedNavItem[] = [
+        { title: 'Dashboard',           href: '/dashboard',  icon: LayoutGrid },
+        { title: 'POS Kasir',           href: '/pos',        icon: Store },
+        { title: 'Riwayat Transaksi',   href: '/penjualan',  icon: Receipt,   readOnly: true },
+    ];
+
+    const navItems: ExtendedNavItem[] = isSuperAdmin
+        ? superAdminNav
+        : isAdmin
+        ? adminNav
+        : isKasir
+        ? kasirNav
+        : [{ title: 'Dashboard', href: '/dashboard', icon: LayoutGrid }];
 
     return (
         <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
+            <SidebarHeader className="border-b border-sidebar-border/60 pb-3">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        <SidebarMenuButton size="lg" asChild className="hover:bg-sidebar-accent/60 transition-colors">
                             <Link href="/dashboard" prefetch>
                                 <AppLogo />
                             </Link>
@@ -122,16 +84,11 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent className="scrollbar-thin">
                 <NavMain items={navItems} />
-                {activityLogItems.length > 0 && (
-                    <div className="mt-auto">
-                        <NavMain items={activityLogItems} />
-                    </div>
-                )}
             </SidebarContent>
 
-            <SidebarFooter>
+            <SidebarFooter className="border-t border-sidebar-border/60 pt-2">
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
