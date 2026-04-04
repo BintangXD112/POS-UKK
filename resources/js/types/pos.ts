@@ -153,6 +153,29 @@ export interface DashboardStats {
     total_supplier: number;
 }
 
+export interface SalesTrend {
+    day: number;
+    total: number;
+    formatted_total: string;
+}
+
+export interface IncomeExpense {
+    month: string;
+    penjualan: number;
+    pembelian: number;
+}
+
+export interface CategoryChart {
+    name: string;
+    value: number;
+}
+
+export interface DashboardCharts {
+    sales_trend: SalesTrend[];
+    income_expense: IncomeExpense[];
+    top_categories: CategoryChart[];
+}
+
 // Cart item untuk POS
 export interface CartItem {
     id_barang: number;

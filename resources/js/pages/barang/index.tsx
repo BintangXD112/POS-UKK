@@ -135,23 +135,26 @@ export default function BarangIndex({ barang, kategori, kelompok, suppliers, isR
         e.preventDefault();
         setProcessing(true);
 
-        const data = new FormData();
-        Object.entries(formData).forEach(([key, value]) => {
-            data.append(key, String(value));
-        });
-        if (iconFile) {
-            data.append('icon', iconFile);
-        }
-
         const url = editing ? `/barang/${editing.id_barang}` : '/barang';
-        const method = editing ? 'post' : 'post';
+        
+        const payload: Record<string, any> = {
+            ...formData,
+        };
+        
+        // Ensure boolean is true/false integer if preferred, though Inertia handles natively
+        payload.is_active = formData.is_active ? 1 : 0;
+
+        if (iconFile) {
+            payload.icon = iconFile;
+        }
 
         if (editing) {
-            data.append('_method', 'PUT');
+            payload._method = 'PUT';
         }
 
-        router.post(url, data, {
+        router.post(url, payload, {
             forceFormData: true,
+            preserveScroll: true,
             onSuccess: () => { setOpen(false); reset(); setProcessing(false); },
             onError: (errs) => { setErrors(errs); setProcessing(false); },
             onFinish: () => setProcessing(false),
@@ -293,7 +296,7 @@ export default function BarangIndex({ barang, kategori, kelompok, suppliers, isR
             {/* Dialog Form — hanya muncul jika tidak read-only */}
             {!isReadOnly && (
                 <Dialog open={open} onOpenChange={(v) => { if (!v) { setOpen(false); reset(); } else setOpen(true); }}>
-                    <DialogContent className="sm:max-w-lg rounded-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogContent className="sm:max-w-lg rounded-2xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-100 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400">

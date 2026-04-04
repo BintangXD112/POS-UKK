@@ -99,12 +99,6 @@ export function AppSidebar() {
     // ── Kasir Nav ────────────────────────────────────────────────────────────
     const kasirNav: NavGroup[] = [
         {
-            title: 'Beranda',
-            items: [
-                { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
-            ]
-        },
-        {
             title: 'Transaksi',
             items: [
                 { title: 'POS Kasir', href: '/pos', icon: Store },
@@ -127,7 +121,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild className="hover:bg-sidebar-accent/60 transition-colors">
-                            <Link href="/dashboard" prefetch>
+                            <Link href={isKasir ? "/pos" : "/dashboard"} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
