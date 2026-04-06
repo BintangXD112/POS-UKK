@@ -461,7 +461,7 @@ export default function PosIndex({ barang, pelanggan }: Props) {
                             <img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=POS-UKK-${bayar?bayar:totalFaktur}`} alt="QRIS Code" className="w-[180px] h-[180px]" />
                         </div>
                         <p className="text-xs font-bold text-teal-700 dark:text-teal-400">NMID: ID10203200000001</p>
-                        <p className="text-[10px] text-muted-foreground mt-1">Dicetak oleh POS Harapan</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">Dicetak oleh POS-UKK</p>
                     </div>
                     <AlertDialogFooter className="mt-4 sm:justify-center flex-row gap-3">
                         <AlertDialogCancel className="w-full mt-0" disabled={processing}>Batal</AlertDialogCancel>

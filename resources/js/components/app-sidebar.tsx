@@ -2,7 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     LayoutGrid, Store, Users, Tag, UserCheck, Truck,
     Package, ShoppingCart, BarChart2, School,
-    Receipt, CreditCard, ClipboardList, Eye,
+    Receipt, CreditCard, ClipboardList, Eye, Database
 } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -58,6 +58,7 @@ export function AppSidebar() {
             title: 'Pengaturan',
             items: [
                 { title: 'Manajemen User', href: '/users', icon: Users },
+                { title: 'Restore Data', href: '/restore-data', icon: Database },
             ]
         }
     ];
@@ -92,6 +93,7 @@ export function AppSidebar() {
             title: 'Pengaturan',
             items: [
                 { title: 'Manajemen User', href: '/users', icon: Users },
+                { title: 'Restore Data', href: '/restore-data', icon: Database },
             ]
         }
     ];

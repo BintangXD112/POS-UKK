@@ -5,6 +5,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\RestoreDataController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PenjualanController;
@@ -63,6 +64,11 @@ Route::middleware(['auth'])->group(function () {
         // Laporan
         Route::get('/laporan/penjualan', [LaporanController::class, 'penjualan'])->name('laporan.penjualan');
         Route::get('/laporan/pembelian', [LaporanController::class, 'pembelian'])->name('laporan.pembelian');
+
+        // Restore Data
+        Route::get('/restore-data', [RestoreDataController::class, 'index'])->name('restore-data.index');
+        Route::post('/restore-data/{type}/{id}/restore', [RestoreDataController::class, 'restore'])->name('restore-data.restore');
+        Route::delete('/restore-data/{type}/{id}/force-delete', [RestoreDataController::class, 'forceDelete'])->name('restore-data.force-delete');
     });
 
     // ── Rekap Transaksi & Struk — Super Admin, Admin, dan Kasir bisa lihat ─────
