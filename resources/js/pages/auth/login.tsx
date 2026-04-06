@@ -19,7 +19,7 @@ export default function Login({ status }: Props) {
             title="Selamat Datang!"
             description="Masukkan kredensial Anda untuk mengakses sistem"
         >
-            <Head title="Login — POS Koperasi" />
+            <Head title="Login — POS UKK" />
 
             {status && (
                 <div className="mb-4 rounded-xl bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 px-4 py-3 text-center text-sm font-medium text-teal-700 dark:text-teal-400">

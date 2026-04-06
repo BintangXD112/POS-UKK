@@ -57,7 +57,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 <SheetHeader className="px-4 py-3 border-b border-sidebar-border/60">
                                     <Link href={dashboard()} className="flex items-center gap-2">
                                         <AppLogoIcon className="h-6 w-6 fill-current text-teal-500" />
-                                        <span className="font-bold text-sm text-sidebar-foreground">POS Koperasi</span>
+                                        <span className="font-bold text-sm text-sidebar-foreground">POS UKK</span>
                                     </Link>
                                 </SheetHeader>
                                 <div className="flex-1 p-3">

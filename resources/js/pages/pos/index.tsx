@@ -49,10 +49,12 @@ export default function PosIndex({ barang, pelanggan }: Props) {
     const [search, setSearch] = useState('');
     const [selectedPelanggan, setSelectedPelanggan] = useState('');
     const [jenis, setJenis] = useState<'tunai' | 'kredit'>('tunai');
-    const [caraBayar, setCaraBayar] = useState('');
+    const [caraBayar, setCaraBayar] = useState('Cash');
     const [bayar, setBayar] = useState('');
     const [processing, setProcessing] = useState(false);
     const [showDebtDialog, setShowDebtDialog] = useState(false);
+    const [showQrisModal, setShowQrisModal] = useState(false);
+    const [printUrl, setPrintUrl] = useState<string | null>(null);
 
     const filteredBarang = barang.filter(b =>
         b.nama.toLowerCase().includes(search.toLowerCase()) ||
@@ -113,12 +115,21 @@ export default function PosIndex({ barang, pelanggan }: Props) {
             return;
         }
 
-        processCheckout();
+        proceedToPaymentMethod();
+    };
+
+    const proceedToPaymentMethod = () => {
+        if (jenis === 'tunai' && caraBayar === 'QRIS') {
+            setShowQrisModal(true);
+        } else {
+            processCheckout();
+        }
     };
 
     const processCheckout = () => {
         setProcessing(true);
         setShowDebtDialog(false);
+        setShowQrisModal(false);
         router.post('/pos', {
             id_pelanggan: selectedPelanggan || null,
             total_bayar: bayar ? Number(bayar) : totalFaktur,
@@ -132,7 +143,10 @@ export default function PosIndex({ barang, pelanggan }: Props) {
                 setSelectedPelanggan('');
                 setProcessing(false);
                 const printId = (page.props.flash as any)?.print_id;
-                if (printId) window.open(`/pos/struk/${printId}?print=true`, '_blank');
+                if (printId) {
+                    // Prevent caching issues by adding timestamp
+                    setPrintUrl(`/pos/struk/${printId}?print=true&t=${Date.now()}`);
+                }
             },
             onError: () => setProcessing(false),
         });
@@ -323,17 +337,31 @@ export default function PosIndex({ barang, pelanggan }: Props) {
                                 <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Jenis</Label>
                                 <select
                                     value={jenis}
-                                    onChange={(e) => setJenis(e.target.value as 'tunai' | 'kredit')}
+                                    onChange={(e) => {
+                                        const val = e.target.value as 'tunai' | 'kredit';
+                                        setJenis(val);
+                                        if (val === 'kredit') setCaraBayar('');
+                                        else if (caraBayar === '') setCaraBayar('Cash');
+                                    }}
                                     className="h-9 w-full rounded-xl border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
                                 >
                                     <option value="tunai">Tunai</option>
                                     <option value="kredit">Kredit / Utang</option>
                                 </select>
                             </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Cara Bayar</Label>
-                                <Input className="h-9 rounded-xl text-xs" value={caraBayar} onChange={e => setCaraBayar(e.target.value)} placeholder="Cash, QRIS..." />
-                            </div>
+                            {jenis === 'tunai' && (
+                                <div className="space-y-1.5">
+                                    <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Metode Pembayaran</Label>
+                                    <select
+                                        value={caraBayar}
+                                        onChange={(e) => setCaraBayar(e.target.value)}
+                                        className="h-9 w-full rounded-xl border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                                    >
+                                        <option value="Cash">Cash</option>
+                                        <option value="QRIS">QRIS</option>
+                                    </select>
+                                </div>
+                            )}
                         </div>
 
 
@@ -405,7 +433,8 @@ export default function PosIndex({ barang, pelanggan }: Props) {
                         <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault();
-                                processCheckout();
+                                setShowDebtDialog(false);
+                                proceedToPaymentMethod();
                             }}
                             disabled={processing}
                             className="bg-orange-600 hover:bg-orange-700 text-white"
@@ -415,6 +444,53 @@ export default function PosIndex({ barang, pelanggan }: Props) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            {/* Modal QRIS */}
+            <AlertDialog open={showQrisModal} onOpenChange={setShowQrisModal}>
+                <AlertDialogContent className="sm:max-w-md">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-center text-teal-600 dark:text-teal-400">
+                            Pembayaran QRIS
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-center text-sm">
+                            Silakan scan kode QR di bawah ini untuk menyelesaikan tagihan sebesar <strong className="text-foreground">{fmtRp(parsedBayar)}</strong>.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="flex flex-col items-center justify-center p-6 bg-white dark:bg-neutral-900 rounded-xl border-2 border-dashed border-teal-200 dark:border-teal-800">
+                        <div className="w-48 h-48 bg-white mb-3 rounded-lg flex items-center justify-center relative shadow-sm border p-2">
+                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=POS-UKK-${bayar?bayar:totalFaktur}`} alt="QRIS Code" className="w-[180px] h-[180px]" />
+                        </div>
+                        <p className="text-xs font-bold text-teal-700 dark:text-teal-400">NMID: ID10203200000001</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">Dicetak oleh POS Harapan</p>
+                    </div>
+                    <AlertDialogFooter className="mt-4 sm:justify-center flex-row gap-3">
+                        <AlertDialogCancel className="w-full mt-0" disabled={processing}>Batal</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={(e) => {
+                                e.preventDefault();
+                                processCheckout();
+                            }}
+                            disabled={processing}
+                            className="bg-teal-600 hover:bg-teal-700 text-white w-full m-0"
+                        >
+                            {processing ? 'Memproses...' : 'Selesai'}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Hidden Iframe for Printing */}
+            {printUrl && (
+                <iframe 
+                    src={printUrl} 
+                    style={{ position: 'absolute', width: '0', height: '0', border: '0', visibility: 'hidden' }} 
+                    title="Print Receipt Iframe"
+                    onLoad={(e) => {
+                        // After it's loaded and presumably printed, we can optionally clear it
+                        setTimeout(() => setPrintUrl(null), 5000);
+                    }}
+                />
+            )}
         </AppLayout>
     );
 }

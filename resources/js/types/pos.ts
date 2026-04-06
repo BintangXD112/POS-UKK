@@ -1,4 +1,4 @@
-// Types untuk aplikasi POS Koperasi
+// Types untuk aplikasi POS UKK
 
 export interface Role {
     id_role: number;

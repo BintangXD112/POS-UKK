@@ -54,7 +54,7 @@ export default function Welcome({
 
     return (
         <>
-            <Head title="POS Koperasi SMK">
+            <Head title="POS UKK">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800"
@@ -79,8 +79,8 @@ export default function Welcome({
                             <ShoppingCart className="h-4.5 w-4.5 text-white" strokeWidth={2.5} />
                         </div>
                         <div>
-                            <span className="text-base font-bold text-white block leading-none">POS Koperasi</span>
-                            <span className="text-[10px] text-teal-400 font-medium">SMK Management</span>
+                            <span className="text-base font-bold text-white block leading-none">POS UKK</span>
+                            <span className="text-[10px] text-teal-400 font-medium">Manajemen Koperasi Sekolah</span>
                         </div>
                     </div>
 
@@ -182,7 +182,7 @@ export default function Welcome({
 
                 {/* ── Footer ── */}
                 <footer className="relative z-10 border-t border-white/8 px-6 py-6 max-w-6xl mx-auto flex items-center justify-between text-xs text-slate-600">
-                    <span>© {new Date().getFullYear()} POS Koperasi SMK. All rights reserved.</span>
+                    <span>© {new Date().getFullYear()} POS UKK. All rights reserved.</span>
                     <span>Sistem Manajemen Koperasi Sekolah</span>
                 </footer>
             </div>

@@ -51,19 +51,5 @@ class SupplierSeeder extends Seeder
             DB::table('tb_supplier')->insert($data);
         }
 
-        $faker = \Faker\Factory::create('id_ID');
-        $autoSuppliers = [];
-        
-        for ($i = 0; $i < 45; $i++) {
-            $autoSuppliers[] = [
-                'id_sekolah' => 1,
-                'nama' => $faker->company,
-                'no_telepon' => $faker->phoneNumber,
-                'alamat_supplier' => $faker->address,
-                'created_by' => 2,
-            ];
-        }
-
-        DB::table('tb_supplier')->insert($autoSuppliers);
     }
 }

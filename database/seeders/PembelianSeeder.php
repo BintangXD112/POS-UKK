@@ -111,50 +111,5 @@ class PembelianSeeder extends Seeder
             ['id_pembelian' => $p5, 'id_barang' => 17, 'satuan' => 'pak', 'jumlah' => 25,  'harga_beli' => 7000,  'subtotal' => 175000],
         ]);
 
-        // ==========================================
-        // AUTO GENERATE BANYAK DATA PEMBELIAN
-        // ==========================================
-        $faker = \Faker\Factory::create('id_ID');
-        
-        for ($i = 0; $i < 65; $i++) {
-            $totalBeli = 0;
-            $items = [];
-            $numItems = rand(2, 6);
-
-            for ($j = 0; $j < $numItems; $j++) {
-                $idBarang = rand(1, 15);
-                $jumlah = rand(10, 100);
-                $hargaBeli = rand(10, 50) * 100;
-                $subtotal = $hargaBeli * $jumlah;
-
-                $items[] = [
-                    'id_barang' => $idBarang,
-                    'satuan' => $faker->randomElement(['pcs', 'botol', 'bungkus', 'box', 'pak']),
-                    'jumlah' => $jumlah,
-                    'harga_beli' => $hargaBeli,
-                    'subtotal' => $subtotal,
-                ];
-                $totalBeli += $subtotal;
-            }
-
-            $idPembelian = DB::table('tb_pembelian')->insertGetId([
-                'id_sekolah' => 1,
-                'id_supplier' => rand(1, 5),
-                'id_user' => rand(1, 4),
-                'nomor_faktur' => 'INV-PB-' . $faker->unique()->numerify('#####'),
-                'tanggal_faktur' => Carbon::now()->subDays(rand(0, 90)),
-                'total_bayar' => $totalBeli,
-                'status_pembelian' => 'selesai',
-                'jenis_transaksi' => $faker->randomElement(['tunai', 'tunai', 'kredit']),
-                'cara_bayar' => $faker->randomElement(['Cash', 'Transfer', 'Tempo 30 Hari']),
-                'note' => $faker->optional(0.3)->sentence,
-                'created_by' => 4,
-            ]);
-
-            foreach ($items as &$item) {
-                $item['id_pembelian'] = $idPembelian;
-            }
-            DB::table('tb_detail_pembelian')->insert($items);
-        }
     }
 }

@@ -141,32 +141,5 @@ class BarangSeeder extends Seeder
             DB::table('tb_barang')->insert($data);
         }
 
-        // AUTO GENERATE SISA DATA BARANG MENCAPAI > 50
-        $faker = \Faker\Factory::create('id_ID');
-        $autoBarang = [];
-
-        for ($i = 0; $i < 35; $i++) {
-            $hargaBeli = $faker->numberBetween(10, 500) * 100;
-            $hargaJual = $hargaBeli + ($faker->numberBetween(1, 20) * 100);
-            $seed = $i + 18; // Continue seed from where manual ones left off
-
-            $autoBarang[] = [
-                'id_sekolah' => 1,
-                'barcode' => 'BRG-' . $faker->unique()->numerify('#####'),
-                'nama' => ucwords($faker->words(3, true)),
-                'icon' => $this->dummyImage($seed),
-                'id_kategori' => $faker->numberBetween(1, 11),
-                'id_kelompok_kategori' => $faker->numberBetween(1, 4),
-                'id_supplier' => $faker->numberBetween(1, 5),
-                'satuan' => $faker->randomElement(['pcs', 'box', 'pak', 'botol', 'lusin']),
-                'harga_beli' => $hargaBeli,
-                'harga_jual' => $hargaJual,
-                'stok' => $faker->numberBetween(5, 500),
-                'is_active' => 1,
-                'created_by' => 1,
-            ];
-        }
-
-        DB::table('tb_barang')->insert($autoBarang);
     }
 }

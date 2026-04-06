@@ -8,10 +8,10 @@ export default function AppLogo() {
             </div>
             <div className="ml-1 grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-bold text-sidebar-foreground tracking-tight text-[13.5px]">
-                    POS Koperasi
+                    POS UKK
                 </span>
                 <span className="truncate text-[10.5px] text-teal-500 dark:text-teal-400 leading-tight font-medium">
-                    SMK Management
+                    Manajemen Koperasi Sekolah
                 </span>
             </div>
         </>

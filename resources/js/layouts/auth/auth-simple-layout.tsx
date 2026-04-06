@@ -33,8 +33,8 @@ export default function AuthSimpleLayout({
                         <ShoppingCart className="h-5 w-5 text-white" strokeWidth={2.5} />
                     </div>
                     <div>
-                        <p className="text-base font-bold text-white tracking-tight leading-none">POS Koperasi</p>
-                        <p className="text-xs text-teal-400 font-medium mt-0.5">SMK Management System</p>
+                        <p className="text-base font-bold text-white tracking-tight leading-none">POS UKK</p>
+                        <p className="text-xs text-teal-400 font-medium mt-0.5">Manajemen Koperasi Sekolah</p>
                     </div>
                 </div>
 
@@ -69,7 +69,7 @@ export default function AuthSimpleLayout({
 
                 {/* Bottom */}
                 <div className="relative z-10">
-                    <p className="text-xs text-slate-600">© {new Date().getFullYear()} POS Koperasi SMK. All rights reserved.</p>
+                    <p className="text-xs text-slate-600">© {new Date().getFullYear()} POS UKK. All rights reserved.</p>
                 </div>
             </div>
 
@@ -82,7 +82,7 @@ export default function AuthSimpleLayout({
                             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-cyan-500 shadow">
                                 <ShoppingCart className="h-4.5 w-4.5 text-white" strokeWidth={2.5} />
                             </div>
-                            <span className="text-lg font-bold text-slate-800 dark:text-white">POS Koperasi</span>
+                            <span className="text-lg font-bold text-slate-800 dark:text-white">POS UKK</span>
                         </Link>
                     </div>
 

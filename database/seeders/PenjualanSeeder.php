@@ -117,58 +117,5 @@ class PenjualanSeeder extends Seeder
             ['id_penjualan' => $pj5, 'id_barang' => 13, 'jumlah_barang' => 1, 'harga_beli' => 1500, 'harga_jual' => 3000, 'diskon_tipe' => 'nominal', 'diskon_nilai' => 0, 'diskon_nominal' => 0, 'subtotal' => 3000],
         ]);
 
-        // ==========================================
-        // AUTO GENERATE BANYAK DATA TRANSAKSI
-        // ==========================================
-        $faker = \Faker\Factory::create('id_ID');
-
-        for ($i = 0; $i < 150; $i++) {
-            $totalFaktur = 0;
-            $items = [];
-            $numItems = rand(1, 4);
-
-            $availableItems = range(1, 15);
-            shuffle($availableItems);
-            $selectedItems = array_slice($availableItems, 0, $numItems);
-
-            foreach ($selectedItems as $idBarang) {
-                $jumlah = rand(1, 3);
-                $hargaBeli = rand(10, 30) * 100;
-                $hargaJual = $hargaBeli + (rand(1, 10) * 100);
-                $subtotal = $hargaJual * $jumlah;
-
-                $items[] = [
-                    'id_barang' => $idBarang,
-                    'jumlah_barang' => $jumlah,
-                    'harga_beli' => $hargaBeli,
-                    'harga_jual' => $hargaJual,
-                    'diskon_tipe' => 'nominal',
-                    'diskon_nilai' => 0,
-                    'diskon_nominal' => 0,
-                    'subtotal' => $subtotal,
-                ];
-                $totalFaktur += $subtotal;
-            }
-
-            $idPenjualan = DB::table('tb_penjualan')->insertGetId([
-                'id_sekolah' => rand(1, 2) === 1 ? 1 : 1, // Tetap dominan di sekolah 1
-                'id_user' => rand(1, 3), // Kasir/Admin
-                'id_pelanggan' => rand(1, 10) > 4 ? rand(1, 8) : null, // Ada yg umum, ada yg terdaftar
-                'tanggal_penjualan' => Carbon::now()->subDays(rand(0, 45))->setTime(rand(7, 18), rand(0, 59)),
-                'total_faktur' => $totalFaktur,
-                'total_bayar' => $totalFaktur,
-                'kembalian' => 0,
-                'status_pembayaran' => 'sudah bayar',
-                'jenis_transaksi' => 'tunai',
-                'cara_bayar' => $faker->randomElement(['Cash', 'Cash', 'Transfer', 'QRIS']),
-                'note' => $faker->optional(0.1)->sentence,
-                'created_by' => 1,
-            ]);
-
-            foreach ($items as &$item) {
-                $item['id_penjualan'] = $idPenjualan;
-            }
-            DB::table('tb_detail_penjualan')->insert($items);
-        }
     }
 }
