@@ -96,7 +96,7 @@ class PenjualanController extends Controller
                 'total_faktur' => $totalFaktur,
                 'total_bayar' => $validated['total_bayar'],
                 'kembalian' => $validated['total_bayar'] - $totalFaktur,
-                'status_pembayaran' => $validated['total_bayar'] < $totalFaktur ? 'hutang' : 'sudah bayar',
+                'status_pembayaran' => $validated['total_bayar'] == 0 ? 'belum bayar' : ($validated['total_bayar'] < $totalFaktur ? 'hutang' : 'sudah bayar'),
                 'jenis_transaksi' => $validated['jenis_transaksi'],
                 'cara_bayar' => $validated['cara_bayar'] ?? null,
                 'note' => $validated['note'] ?? null,
@@ -135,8 +135,8 @@ class PenjualanController extends Controller
 
     public function lunasi(Penjualan $penjualan): RedirectResponse
     {
-        if ($penjualan->status_pembayaran !== 'hutang') {
-            return back()->with('error', 'Transaksi ini bukan hutang.');
+        if (!in_array($penjualan->status_pembayaran, ['hutang', 'belum bayar'])) {
+            return back()->with('error', 'Transaksi ini tidak memiliki hutang.');
         }
 
         $penjualan->update([

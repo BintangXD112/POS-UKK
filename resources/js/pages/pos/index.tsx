@@ -104,7 +104,7 @@ export default function PosIndex({ barang, pelanggan }: Props) {
     const removeFromCart = (id: number) => setCart(prev => prev.filter(c => c.id_barang !== id));
 
     const totalFaktur = cart.reduce((s, c) => s + c.subtotal, 0);
-    const parsedBayar = bayar !== '' ? Number(bayar) : totalFaktur;
+    const parsedBayar = bayar !== '' ? Number(bayar) : (jenis === 'kredit' ? 0 : totalFaktur);
     const kembalian = parsedBayar - totalFaktur;
 
     const handleCheckout = () => {
@@ -132,7 +132,7 @@ export default function PosIndex({ barang, pelanggan }: Props) {
         setShowQrisModal(false);
         router.post('/pos', {
             id_pelanggan: selectedPelanggan || null,
-            total_bayar: bayar ? Number(bayar) : totalFaktur,
+            total_bayar: parsedBayar,
             jenis_transaksi: jenis,
             cara_bayar: caraBayar,
             items: cart as any,

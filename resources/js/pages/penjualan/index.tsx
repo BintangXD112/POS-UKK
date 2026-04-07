@@ -168,8 +168,8 @@ export default function PenjualanIndex({ penjualan, isReadOnly, sekolahList, sel
                                                         variant="ghost" 
                                                         size="sm" 
                                                         className="h-8 w-8 p-0 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 disabled:opacity-30 disabled:pointer-events-none" 
-                                                        disabled={p.status_pembayaran !== 'hutang'}
-                                                        title={p.status_pembayaran === 'hutang' ? "Lunasi Hutang" : ""}
+                                                        disabled={p.status_pembayaran !== 'hutang' && p.status_pembayaran !== 'belum bayar'}
+                                                        title={(p.status_pembayaran === 'hutang' || p.status_pembayaran === 'belum bayar') ? "Lunasi Hutang" : ""}
                                                         onClick={() => setLunasiData(p.id_penjualan)}
                                                     >
                                                         <Wallet className="h-3.5 w-3.5" />

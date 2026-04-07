@@ -65,8 +65,23 @@ class PelangganController extends Controller
 
     public function destroyKelompok(KelompokPelanggan $kelompok): RedirectResponse
     {
+        if ($kelompok->pelanggan()->exists()) {
+            return back()->with('error', 'Kelompok pelanggan tidak dapat dihapus karena masih memiliki data pelanggan aktif di dalamnya.');
+        }
+
+        // Jika hanya ada pelanggan yang sudah di-soft-delete, coba hapus permanen
+        $trashed = $kelompok->pelanggan()->withTrashed()->get();
+        if ($trashed->isNotEmpty()) {
+            try {
+                foreach ($trashed as $p) {
+                    $p->forceDelete();
+                }
+            } catch (\Exception $e) {
+                return back()->with('error', 'Kelompok pelanggan tidak dapat dihapus karena riwayat pelanggannya masih terikat dengan data Penjualan.');
+            }
+        }
+        
         $nama = $kelompok->nama_kelompok;
-        $kelompok->pelanggan()->each(fn (Pelanggan $p) => $p->delete());
         $kelompok->delete();
         ActivityLogger::log('delete', 'Pelanggan', "Menghapus kelompok pelanggan: {$nama}");
 

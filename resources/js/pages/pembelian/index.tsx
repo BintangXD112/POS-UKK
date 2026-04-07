@@ -249,7 +249,7 @@ export default function PembelianIndex({ pembelian, suppliers, barang, isReadOnl
                                             </div>
                                             <div className="col-span-3 space-y-1">
                                                 <Label className="text-[10px] text-muted-foreground uppercase">Harga Beli</Label>
-                                                <Input type="number" className="h-8 text-xs rounded-lg bg-background" value={item.harga_beli} onChange={e => updateItem(idx, 'harga_beli', Number(e.target.value))} min="0" />
+                                                <Input type="number" className="h-8 text-xs rounded-lg bg-muted/50 cursor-not-allowed focus-visible:ring-0" value={item.harga_beli} readOnly tabIndex={-1} />
                                             </div>
                                             <div className="col-span-1 flex justify-end pb-1">
                                                 <button type="button" onClick={() => removeItem(idx)} className="h-7 w-7 flex items-center justify-center rounded-md bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors">

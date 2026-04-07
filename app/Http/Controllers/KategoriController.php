@@ -67,8 +67,23 @@ class KategoriController extends Controller
 
     public function destroyKelompok(KelompokKategori $kelompok): RedirectResponse
     {
+        if ($kelompok->kategori()->exists()) {
+            return back()->with('error', 'Kelompok kategori tidak dapat dihapus karena masih memiliki data kategori aktif di dalamnya.');
+        }
+
+        // Jika hanya ada kategori yang sudah di-soft-delete, coba hapus permanen
+        $trashed = $kelompok->kategori()->withTrashed()->get();
+        if ($trashed->isNotEmpty()) {
+            try {
+                foreach ($trashed as $k) {
+                    $k->forceDelete();
+                }
+            } catch (\Exception $e) {
+                return back()->with('error', 'Kelompok kategori tidak dapat dihapus karena riwayat kategorinya masih digunakan oleh data Barang.');
+            }
+        }
+        
         $nama = $kelompok->nama_kelompok;
-        $kelompok->kategori()->each(fn (Kategori $k) => $k->delete());
         $kelompok->delete();
         ActivityLogger::log('delete', 'Kategori', "Menghapus kelompok kategori: {$nama}");
 
