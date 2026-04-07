@@ -50,7 +50,13 @@ class RestoreDataController extends Controller
         $query = $modelClass::onlyTrashed();
 
         if ($sekolahId) {
-            $query->where('id_sekolah', $sekolahId);
+            if ($type === 'kategori' || $type === 'pelanggan') {
+                $query->whereHas('kelompok', function ($q) use ($sekolahId) {
+                    $q->where('id_sekolah', $sekolahId);
+                });
+            } else {
+                $query->where('id_sekolah', $sekolahId);
+            }
         }
 
         $deletedRecords = $query->orderBy('deleted_at', 'desc')->get();
@@ -116,7 +122,13 @@ class RestoreDataController extends Controller
         }
 
         $user = $request->user();
-        if (!$user->isSuperAdmin() && $item->id_sekolah !== $user->id_sekolah) {
+        
+        $itemSekolahId = $item->id_sekolah;
+        if ($type === 'kategori' || $type === 'pelanggan') {
+            $itemSekolahId = $item->kelompok->id_sekolah ?? null;
+        }
+
+        if (!$user->isSuperAdmin() && $itemSekolahId !== $user->id_sekolah) {
             return back()->with('error', 'Akses ditolak.');
         }
 
@@ -148,7 +160,13 @@ class RestoreDataController extends Controller
         }
 
         $user = $request->user();
-        if (!$user->isSuperAdmin() && $item->id_sekolah !== $user->id_sekolah) {
+        
+        $itemSekolahId = $item->id_sekolah;
+        if ($type === 'kategori' || $type === 'pelanggan') {
+            $itemSekolahId = $item->kelompok->id_sekolah ?? null;
+        }
+
+        if (!$user->isSuperAdmin() && $itemSekolahId !== $user->id_sekolah) {
             return back()->with('error', 'Akses ditolak.');
         }
 
